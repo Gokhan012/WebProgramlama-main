@@ -13,12 +13,14 @@ namespace OnlineQuizMVC.Data
         public DbSet<User> Users { get; set; }
         public DbSet<SavedTest> SavedTests { get; set; }
         public DbSet<ExamHistory> ExamHistories { get; set; }
+        public DbSet<QuizQuestion> Questions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().ToTable("users");
             modelBuilder.Entity<SavedTest>().ToTable("saved_tests");
             modelBuilder.Entity<ExamHistory>().ToTable("exam_history");
+            modelBuilder.Entity<QuizQuestion>().ToTable("questions");
         }
     }
 }

@@ -119,7 +119,6 @@
 </div>
 
 @section Scripts {
-    <script src="~/questions.js"></script>
     <script>
         const courseData = {
             "Yazılım": [
@@ -190,16 +189,20 @@
             loadQotdPreview();
         });
 
-        function loadQotdPreview() {
-            const topics = Object.keys(questionsDB);
-            const randomTopic = topics[Math.floor(Math.random() * topics.length)];
-            const questions = questionsDB[randomTopic];
-            const randomQ = questions[Math.floor(Math.random() * questions.length)];
-            
-            // Seçilen soruyu çözme sayfasına aktarmak için geçici olarak sakla
-            sessionStorage.setItem("current_qotd", JSON.stringify(randomQ));
-            
-            document.getElementById("qotd-preview-text").innerText = randomQ.soru;
+        async function loadQotdPreview() {
+            try {
+                const res = await fetch('/api/questions/daily');
+                if(res.ok) {
+                    const randomQ = await res.json();
+                    sessionStorage.setItem("current_qotd", JSON.stringify(randomQ));
+                    document.getElementById("qotd-preview-text").innerText = randomQ.soru;
+                } else {
+                    document.getElementById("qotd-preview-text").innerText = "Günün sorusu bulunamadı.";
+                }
+            } catch(e) {
+                console.error(e);
+                document.getElementById("qotd-preview-text").innerText = "Soru yüklenemedi.";
+            }
         }
 
         function loadRealLeaderboard() {

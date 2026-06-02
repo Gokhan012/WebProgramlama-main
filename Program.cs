@@ -24,6 +24,8 @@ using (var scope = app.Services.CreateScope())
         db.Database.ExecuteSqlRaw("ALTER TABLE exam_history ADD COLUMN Wrong INTEGER NOT NULL DEFAULT 0;");
         db.Database.ExecuteSqlRaw("ALTER TABLE exam_history ADD COLUMN Empty INTEGER NOT NULL DEFAULT 0;");
     } catch { }
+
+    QuestionSeeder.Seed(db);
 }
 
 // Configure the HTTP request pipeline.

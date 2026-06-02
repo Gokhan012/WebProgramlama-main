@@ -399,8 +399,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
         const quizTopic = localStorage.getItem("quizTopic");
         
-        // Konu kontrolü yap
-        if (quizTopic && typeof questionsDB !== 'undefined' && questionsDB[quizTopic]) {
+        // Konu kontrolü yap (DB'den çekeceğimiz için questionsDB kontrolünü kaldırdık)
+        if (quizTopic) {
             // Ayar ekranını göster
             configArea.style.display = "block";
             quizArea.style.display = "none";
@@ -418,39 +418,42 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
-function startWithQuestions(count) {
+async function startWithQuestions(count) {
     const quizTopic = localStorage.getItem("quizTopic");
-    let rawQuestions = [...questionsDB[quizTopic]];
     
-    // Havuzdaki tüm soruları rastgele karıştır (Shuffle)
-    for (let i = rawQuestions.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [rawQuestions[i], rawQuestions[j]] = [rawQuestions[j], rawQuestions[i]];
-    }
-    
-    // Sadece kullanıcının istediği adet kadar soruyu kes (slice)
-    dersler = rawQuestions.slice(0, count);
-    
-    // Seçilen soruların şıklarını da kendi içinde karıştır
-    dersler.forEach(q => {
-        let options = [...q.secenekler];
-        for (let i = options.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [options[i], options[j]] = [options[j], options[i]];
+    try {
+        const res = await fetch(`/api/questions?topic=${encodeURIComponent(quizTopic)}&count=${count}`);
+        if (!res.ok) {
+            alert("Sorular yüklenirken hata oluştu veya bu konuya ait soru bulunamadı.");
+            window.location.href = "/Home/Index";
+            return;
         }
-        q.secenekler = options;
-    });
+        const data = await res.json();
+        dersler = data;
+        
+        // Seçilen soruların şıklarını karıştır
+        dersler.forEach(q => {
+            let options = [...q.secenekler];
+            for (let i = options.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [options[i], options[j]] = [options[j], options[i]];
+            }
+            q.secenekler = options;
+        });
 
-    verilenCevaplar = new Array(dersler.length).fill(null);
-    mevcutSoruIndex = 0;
-    
-    // Ayar ekranını gizle, sınav alanını göster
-    document.getElementById("config-area").style.display = "none";
-    document.getElementById("quiz-area").style.display = "block";
-    const navContainer = document.getElementById("nav-container");
-    if(navContainer) navContainer.style.display = "flex";
-    
-    soruyuYukle();
+        verilenCevaplar = new Array(dersler.length).fill(null);
+        mevcutSoruIndex = 0;
+        
+        // Ayar ekranını gizle, sınav alanını göster
+        document.getElementById("config-area").style.display = "none";
+        document.getElementById("quiz-area").style.display = "block";
+        const navContainer = document.getElementById("nav-container");
+        if(navContainer) navContainer.style.display = "flex";
+        
+        soruyuYukle();
+    } catch(err) {
+        alert("Bağlantı hatası: " + err);
+    }
 }
 
 

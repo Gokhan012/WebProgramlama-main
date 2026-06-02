@@ -1,0 +1,180 @@
+@{
+    ViewData["Title"] = "Admin Paneli";
+}
+
+<div class="main-content" style="display: flex; justify-content: center; padding: 40px 20px;">
+    <div class="box" style="width: 100%; max-width: 800px; padding: 40px;">
+        <h2 style="margin-top: 0; color: #0f172a; text-align: center; margin-bottom: 30px;">⚙️ Admin Paneli - Soru Ekle</h2>
+        
+        <div id="alertMsg" style="display: none; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: 600; text-align: center;"></div>
+
+        <form id="addQuestionForm" onsubmit="submitQuestion(event)">
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Konu Seçin</label>
+                <select id="topic" required style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 15px;">
+                    <option value="">-- Konu Seç --</option>
+                    <optgroup label="Yazılım">
+                        <option value="HTML & CSS Temelleri">HTML & CSS Temelleri</option>
+                        <option value="JavaScript İleri Seviye">JavaScript İleri Seviye</option>
+                        <option value="Python ile Veri Bilimi">Python ile Veri Bilimi</option>
+                        <option value="C# ve .NET Core">C# ve .NET Core</option>
+                        <option value="Veritabanı (SQL)">Veritabanı (SQL)</option>
+                    </optgroup>
+                    <optgroup label="Matematik">
+                        <option value="Türev ve Uygulamaları">Türev ve Uygulamaları</option>
+                        <option value="İntegral">İntegral</option>
+                        <option value="Trigonometri">Trigonometri</option>
+                        <option value="Matris ve Determinant">Matris ve Determinant</option>
+                        <option value="Olasılık">Olasılık</option>
+                    </optgroup>
+                    <optgroup label="Fizik">
+                        <option value="Mekanik ve Dinamik">Mekanik ve Dinamik</option>
+                        <option value="Elektrik ve Manyetizma">Elektrik ve Manyetizma</option>
+                        <option value="Optik">Optik</option>
+                        <option value="Modern Fizik">Modern Fizik</option>
+                    </optgroup>
+                    <optgroup label="Tarih">
+                        <option value="Osmanlı Devleti Yükseliş">Osmanlı Devleti Yükseliş</option>
+                        <option value="İnkılap Tarihi">İnkılap Tarihi</option>
+                        <option value="İlk Çağ Uygarlıkları">İlk Çağ Uygarlıkları</option>
+                        <option value="Soğuk Savaş Dönemi">Soğuk Savaş Dönemi</option>
+                    </optgroup>
+                    <optgroup label="Genel Kültür">
+                        <option value="Dünya Başkentleri">Dünya Başkentleri</option>
+                        <option value="Sanat ve Edebiyat">Sanat ve Edebiyat</option>
+                        <option value="Sinema Tarihi">Sinema Tarihi</option>
+                        <option value="Güncel Olaylar">Güncel Olaylar</option>
+                    </optgroup>
+                    <optgroup label="Yabancı Dil">
+                        <option value="İngilizce Grammar">İngilizce Grammar</option>
+                        <option value="Günlük Konuşma">Günlük Konuşma</option>
+                        <option value="İş İngilizcesi">İş İngilizcesi</option>
+                        <option value="Kelime Bilgisi">Kelime Bilgisi</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Soru Metni</label>
+                <textarea id="questionText" required rows="3" style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 15px; resize: vertical;" placeholder="Soruyu buraya yazın..."></textarea>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 12px;">Şıklar (Doğru cevabı sol taraftan işaretleyin!)</label>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="radio" name="correctOption" value="0" required style="transform: scale(1.5); cursor: pointer;" title="Doğru cevap bu şık ise işaretleyin">
+                        <input type="text" id="opt0" required placeholder="A Şıkkı" style="flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px;">
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="radio" name="correctOption" value="1" required style="transform: scale(1.5); cursor: pointer;" title="Doğru cevap bu şık ise işaretleyin">
+                        <input type="text" id="opt1" required placeholder="B Şıkkı" style="flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px;">
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="radio" name="correctOption" value="2" required style="transform: scale(1.5); cursor: pointer;" title="Doğru cevap bu şık ise işaretleyin">
+                        <input type="text" id="opt2" required placeholder="C Şıkkı" style="flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px;">
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="radio" name="correctOption" value="3" required style="transform: scale(1.5); cursor: pointer;" title="Doğru cevap bu şık ise işaretleyin">
+                        <input type="text" id="opt3" required placeholder="D Şıkkı" style="flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px;">
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="radio" name="correctOption" value="4" required style="transform: scale(1.5); cursor: pointer;" title="Doğru cevap bu şık ise işaretleyin">
+                        <input type="text" id="opt4" required placeholder="E Şıkkı" style="flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px;">
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" id="saveBtn" class="action-btn auth-btn" style="width: 100%; background-color: #10b981; border: none; font-size: 16px; cursor: pointer;">
+                ✅ Soruyu Kaydet
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const userName = sessionStorage.getItem("loggedInUser");
+            if (!userName || userName.toLowerCase() !== "admin") {
+                alert("Yetkisiz erişim! Bu sayfayı yalnızca Admin yetkisine sahip kullanıcılar görüntüleyebilir.");
+                window.location.href = "/Home/Index";
+            }
+        });
+
+        async function submitQuestion(e) {
+            e.preventDefault();
+            const btn = document.getElementById("saveBtn");
+            const alertMsg = document.getElementById("alertMsg");
+            
+            btn.disabled = true;
+            btn.innerText = "Kaydediliyor...";
+
+            const topic = document.getElementById("topic").value;
+            const text = document.getElementById("questionText").value;
+            
+            const options = [
+                document.getElementById("opt0").value,
+                document.getElementById("opt1").value,
+                document.getElementById("opt2").value,
+                document.getElementById("opt3").value,
+                document.getElementById("opt4").value
+            ];
+            
+            const checkedRadio = document.querySelector('input[name="correctOption"]:checked');
+            if (!checkedRadio) {
+                alert("Lütfen doğru cevabı işaretleyin.");
+                btn.disabled = false;
+                btn.innerText = "✅ Soruyu Kaydet";
+                return;
+            }
+            
+            const correctIndex = checkedRadio.value;
+            const correctText = options[correctIndex];
+
+            const payload = {
+                Topic: topic,
+                QuestionText: text,
+                Options: options,
+                CorrectAnswer: correctText
+            };
+
+            try {
+                const res = await fetch('/api/questions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if(res.ok) {
+                    alertMsg.style.display = "block";
+                    alertMsg.style.backgroundColor = "#dcfce7";
+                    alertMsg.style.color = "#166534";
+                    alertMsg.innerText = "🎉 Soru başarıyla veritabanına eklendi!";
+                    
+                    // Formu sıfırla ama konuyu tut (ard arda eklemek kolay olsun)
+                    document.getElementById("questionText").value = "";
+                    document.getElementById("opt0").value = "";
+                    document.getElementById("opt1").value = "";
+                    document.getElementById("opt2").value = "";
+                    document.getElementById("opt3").value = "";
+                    document.getElementById("opt4").value = "";
+                    checkedRadio.checked = false;
+                    
+                    setTimeout(() => { alertMsg.style.display = "none"; }, 3000);
+                } else {
+                    throw new Error("Sunucu hatası");
+                }
+            } catch(error) {
+                console.error(error);
+                alertMsg.style.display = "block";
+                alertMsg.style.backgroundColor = "#fee2e2";
+                alertMsg.style.color = "#991b1b";
+                alertMsg.innerText = "❌ Soru eklenirken bir hata oluştu.";
+            }
+
+            btn.disabled = false;
+            btn.innerText = "✅ Soruyu Kaydet";
+        }
+    </script>
+}

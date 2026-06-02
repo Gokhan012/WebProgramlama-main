@@ -14,7 +14,13 @@ export const AuthHandler = {
         if (!navSection) return;
 
         if (user) {
+            let adminBtnHtml = "";
+            if (user.toLowerCase() === "admin") {
+                adminBtnHtml = `<a href="/Home/Admin" class="restart-btn" style="text-decoration: none; color: #10b981; border-color: #a7f3d0; background: #ecfdf5; padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 600;">⚙️ Admin Paneli</a>`;
+            }
+
             navSection.innerHTML = `
+                ${adminBtnHtml}
                 <a href="/Home/Profile" class="restart-btn" style="text-decoration: none; color: #3b82f6; border-color: #bfdbfe; background: #eff6ff; padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 600;">👤 Profil</a>
                 <button id="navLogoutBtn" class="restart-btn" style="color: #ef4444; border-color: #fecaca; background: #fef2f2; cursor: pointer; padding: 8px 16px;">
                     <span class="icon">🚪</span> Çıkış Yap

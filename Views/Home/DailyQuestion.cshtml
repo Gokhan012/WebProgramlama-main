@@ -32,7 +32,6 @@
 </div>
 
 @section Scripts {
-    <script src="~/questions.js"></script>
     <script>
         let currentQuestion = null;
         let answered = false;
@@ -55,7 +54,7 @@
             }
         });
 
-        function loadRandomQuestion() {
+        async function loadRandomQuestion() {
             let savedQ = sessionStorage.getItem("current_qotd");
             if (savedQ) {
                 try {
@@ -63,10 +62,18 @@
                 } catch(e){}
             }
             if (!currentQuestion) {
-                const topics = Object.keys(questionsDB);
-                const randomTopic = topics[Math.floor(Math.random() * topics.length)];
-                const questions = questionsDB[randomTopic];
-                currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+                try {
+                    const res = await fetch('/api/questions/daily');
+                    if(res.ok) {
+                        currentQuestion = await res.json();
+                    } else {
+                        document.getElementById("q-text").innerText = "Soru yüklenemedi.";
+                        return;
+                    }
+                } catch(e) {
+                    document.getElementById("q-text").innerText = "Bağlantı hatası.";
+                    return;
+                }
             }
 
             // Soruyu ekrana bas

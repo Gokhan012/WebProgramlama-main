@@ -208,6 +208,74 @@ namespace OnlineQuizMVC.Controllers
 
             return Ok(leaderboard);
         }
+
+        [HttpGet("questions/daily")]
+        public async Task<IActionResult> GetDailyQuestion()
+        {
+            var randomQuestion = await _context.Questions
+                .OrderBy(q => EF.Functions.Random())
+                .Select(q => new
+                {
+                    soru = q.QuestionText,
+                    secenekler = JsonSerializer.Deserialize<List<string>>(q.OptionsJson, (JsonSerializerOptions)null),
+                    dogruCevap = q.CorrectAnswer
+                })
+                .FirstOrDefaultAsync();
+
+            if (randomQuestion == null)
+                return NotFound(new { error = "Soru bulunamadı." });
+
+            return Ok(randomQuestion);
+        }
+
+        public class QuestionDto
+        {
+            public string Topic { get; set; }
+            public string QuestionText { get; set; }
+            public List<string> Options { get; set; }
+            public string CorrectAnswer { get; set; }
+        }
+
+        [HttpPost("questions")]
+        public async Task<IActionResult> AddQuestion([FromBody] QuestionDto model)
+        {
+            if (string.IsNullOrEmpty(model.Topic) || string.IsNullOrEmpty(model.QuestionText) || model.Options == null || model.Options.Count < 2 || string.IsNullOrEmpty(model.CorrectAnswer))
+                return BadRequest(new { error = "Eksik bilgi gönderildi." });
+
+            var question = new QuizQuestion
+            {
+                Topic = model.Topic,
+                QuestionText = model.QuestionText,
+                OptionsJson = JsonSerializer.Serialize(model.Options),
+                CorrectAnswer = model.CorrectAnswer
+            };
+
+            _context.Questions.Add(question);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, id = question.Id });
+        }
+
+        [HttpGet("questions")]
+        public async Task<IActionResult> GetQuestions(string topic, int count = 10)
+        {
+            var questions = await _context.Questions
+                .Where(q => q.Topic == topic)
+                .OrderBy(q => EF.Functions.Random()) // Randomize
+                .Take(count)
+                .Select(q => new
+                {
+                    soru = q.QuestionText,
+                    secenekler = JsonSerializer.Deserialize<List<string>>(q.OptionsJson, (JsonSerializerOptions)null),
+                    dogruCevap = q.CorrectAnswer
+                })
+                .ToListAsync();
+
+            if (!questions.Any())
+                return NotFound(new { error = "Bu konu için soru bulunamadı." });
+
+            return Ok(questions);
+        }
     }
 
     // Helper Models for Request Data
