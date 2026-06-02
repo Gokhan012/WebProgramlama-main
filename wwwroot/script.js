@@ -1,12 +1,7 @@
-// Sorular questions.js içerisindeki questionsDB objesinden dinamik olarak çekilir.
-let dersler = [];
-
-
+let havuzSorular = []; // Veritabanından gelen tüm sorular
+let dersler = [];      // Şu an kullanıcının önündeki sorular
 let mevcutSoruIndex = 0;
-let verilenCevaplar = new Array(dersler.length).fill(null);
-let testBasladiMi = false;
-
-
+let verilenCevaplar = [];
 
 function autoSaveTest() {
     const userName = sessionStorage.getItem("loggedInUser");
@@ -65,6 +60,7 @@ function soruyuYukle() {
     document.getElementById("message-area").style.display = "none";
     document.getElementById("next-btn").style.display = "none";
     document.getElementById("finish-btn").style.display = "none";
+    document.getElementById("fetch-more-btn").style.display = "none";
 
     const mevcutSoru = dersler[mevcutSoruIndex];
 
@@ -73,7 +69,6 @@ function soruyuYukle() {
 
     const h3 = document.createElement("h3");
     
-    // Ders ve Konu Bilgisini Göster
     const quizCourse = localStorage.getItem("quizCourse");
     const quizTopic = localStorage.getItem("quizTopic");
     
@@ -88,7 +83,6 @@ function soruyuYukle() {
     const ul = document.createElement("ul");
     ul.className = "options-list";
 
-    // Şık Harfleri Dizisi 
     const harfler = ["A", "B", "C", "D", "E"];
 
     mevcutSoru.secenekler.forEach((secenekText, idx) => {
@@ -100,11 +94,9 @@ function soruyuYukle() {
         const safeText = secenekText.replace(/</g, "&lt;").replace(/>/g, "&gt;");
         btn.innerHTML = "<strong>" + harfler[idx] + ")</strong>" + safeText;
         
-        // Eğer bu soruya daha önce cevap verdiysek
-        if (verilenCevaplar[mevcutSoruIndex] !== null) {
+        if (verilenCevaplar[mevcutSoruIndex] !== null && verilenCevaplar[mevcutSoruIndex] !== undefined) {
             btn.disabled = true;
             
-            // Eğer butondaki cevap verdiğimiz cevapsa:
             if (secenekText === verilenCevaplar[mevcutSoruIndex]) {
                 const messageArea = document.getElementById("message-area");
                 messageArea.style.display = "block";
@@ -121,7 +113,6 @@ function soruyuYukle() {
                 }
             }
         } else {
-            // Soru henüz cevaplanmadıysa tıklama çalışsın
             btn.onclick = function() {
                 verilenCevaplar[mevcutSoruIndex] = secenekText;
                 autoSaveTest();
@@ -136,23 +127,23 @@ function soruyuYukle() {
     box.appendChild(ul);
     quizArea.appendChild(box);
     
-    // Eğer cevaplandıysa, ileri veya bitir butonu (Büyük butonlar için)
-    if (verilenCevaplar[mevcutSoruIndex] !== null) {
+    if (verilenCevaplar[mevcutSoruIndex] !== null && verilenCevaplar[mevcutSoruIndex] !== undefined) {
         if (mevcutSoruIndex < dersler.length - 1) {
             document.getElementById("next-btn").style.display = "inline-block";
         } else {
             document.getElementById("finish-btn").style.display = "inline-block";
+            if(havuzSorular.length > 0) {
+                document.getElementById("fetch-more-btn").style.display = "inline-block";
+            }
         }
     }
     
-    // Küçük nav butonları görünürlük kontrolü
     const prevBtn = document.getElementById("prev-btn");
     const nextBtnSmall = document.getElementById("next-btn-small");
     if (prevBtn) prevBtn.style.visibility = (mevcutSoruIndex === 0) ? "hidden" : "visible";
     if (nextBtnSmall) nextBtnSmall.style.visibility = (mevcutSoruIndex === dersler.length - 1) ? "hidden" : "visible";
 }
 
-// Navigasyon Menüsünü Oluştur
 function navigasyonBas() {
     const paginationBar = document.getElementById("pagination-bar");
     if (!paginationBar) return;
@@ -163,12 +154,10 @@ function navigasyonBas() {
         pageItem.className = "page-item";
         pageItem.innerText = (i + 1);
         
-        // Şu anki sorudaysa active sınıfını ver
         if (i === mevcutSoruIndex) {
             pageItem.classList.add("active");
         } 
-        // Ancak ayrıca daha önce cevaplanmışsa rengine göre sınıf ekle
-        else if (verilenCevaplar[i] !== null) {
+        else if (verilenCevaplar[i] !== null && verilenCevaplar[i] !== undefined) {
             if (verilenCevaplar[i] === dersler[i].dogruCevap) {
                 pageItem.classList.add("answered-correct");
             } else {
@@ -190,13 +179,11 @@ function soruyaGit(index) {
     document.getElementById("message-area").style.display = "none";
     document.getElementById("next-btn").style.display = "none";
     document.getElementById("finish-btn").style.display = "none";
+    document.getElementById("fetch-more-btn").style.display = "none";
 
     const activeBox = document.querySelector(".box");
     if (activeBox) {
-        // Eski soruyu sola kaydırarak kaybet
         activeBox.style.animation = "slideOut 0.3s ease-in forwards";
-        
-        // Animasyon bitince (300ms) yenisini getir
         setTimeout(() => {
             mevcutSoruIndex = index;
             soruyuYukle();
@@ -207,29 +194,23 @@ function soruyaGit(index) {
     }
 }
 
-
 function cevapKontrol(tiklananButon, secilenCevap) {
     if(tiklananButon.disabled) return;
 
-    // Verilen cevabı doğrudan index bazlı array'a kaydet
     verilenCevaplar[mevcutSoruIndex] = secilenCevap;
 
     const mevcutSoru = dersler[mevcutSoruIndex];
     const messageArea = document.getElementById("message-area");
     messageArea.style.display = "block";
 
-    // DOĞRU CEVAP
     if (secilenCevap === mevcutSoru.dogruCevap) {
         tiklananButon.classList.add("correct");
         messageArea.className = "alert-success";
         messageArea.innerHTML = "<strong>✅ Harika!</strong> Doğru cevap. <em>(Sonraki soruya geçiliyor...)</em>";
         
         navigasyonBas();
-        // Doğru bildiyse otomatik geçiş parametresi (true) gönder
         soruyuKapat(true);
-    } 
-    // YANLIŞ CEVAP
-    else {
+    } else {
         tiklananButon.classList.add("wrong");
         messageArea.className = "alert-danger";
         
@@ -237,11 +218,9 @@ function cevapKontrol(tiklananButon, secilenCevap) {
         messageArea.innerHTML = "<strong>❌ Yanlış Cevap!</strong><br><br>Doğru Cevabı: " + safeAnswer;
         
         navigasyonBas();
-        // Yanlışsa sadece kapat 
         soruyuKapat(false);
     }
 }
-
 
 function soruyuKapat(otomatikGecis = false) {
     const documentBtns = document.getElementById("quiz-area").querySelectorAll(".btn");
@@ -250,23 +229,30 @@ function soruyuKapat(otomatikGecis = false) {
     });
 
     if (otomatikGecis) {
-        // İleri veya Bitir butonlarını hiç çıkarma, 1 saniye bekle ve diğerine geç
         document.getElementById("next-btn").style.display = "none";
         document.getElementById("finish-btn").style.display = "none";
+        document.getElementById("fetch-more-btn").style.display = "none";
         
         setTimeout(() => {
             if (mevcutSoruIndex < dersler.length - 1) {
                 soruyaGit(mevcutSoruIndex + 1);
             } else {
-                sinaviBitir();
+                if(havuzSorular.length > 0) {
+                    document.getElementById("finish-btn").style.display = "inline-block";
+                    document.getElementById("fetch-more-btn").style.display = "inline-block";
+                } else {
+                    sinaviBitir();
+                }
             }
-        }, 1200); // 1.2 saniye beklet
+        }, 1200); 
     } else {
-        // Yanlış bildiyse butonları çıkart 
         if (mevcutSoruIndex < dersler.length - 1) {
             document.getElementById("next-btn").style.display = "inline-block";
         } else {
             document.getElementById("finish-btn").style.display = "inline-block";
+            if(havuzSorular.length > 0) {
+                document.getElementById("fetch-more-btn").style.display = "inline-block";
+            }
         }
     }
 }
@@ -287,10 +273,34 @@ function siradakiSoru() {
     }
 }
 
+function besSoruDahaGetir() {
+    if(havuzSorular.length === 0) return;
+    
+    // 5 Soru al (veya kalan ne kadarsa)
+    const yeniSorular = havuzSorular.splice(0, 5);
+    
+    // Şıkları karıştır ve listeye ekle
+    yeniSorular.forEach(q => {
+        let options = [...q.secenekler];
+        for (let i = options.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [options[i], options[j]] = [options[j], options[i]];
+        }
+        q.secenekler = options;
+        dersler.push(q);
+        verilenCevaplar.push(null);
+    });
+    
+    // Mevcut soru indeksini artırıp 6. soruya geçir
+    mevcutSoruIndex++;
+    autoSaveTest();
+    soruyuYukle();
+}
+
 function sinaviBitir() {
-    // Sınav biterken de son soruyu kaydır
     document.getElementById("message-area").style.display = "none";
     document.getElementById("finish-btn").style.display = "none";
+    document.getElementById("fetch-more-btn").style.display = "none";
     const navContainer = document.getElementById("nav-container");
     if (navContainer) navContainer.style.display = "none";
 
@@ -298,9 +308,8 @@ function sinaviBitir() {
     let finalYanlisSayisi = 0;
     let finalBosSayisi = 0;
 
-    // Doğru, yanlış ve boşları diziden tekrar sayıyoruz
     for (let i = 0; i < dersler.length; i++) {
-        if (verilenCevaplar[i] === null) {
+        if (verilenCevaplar[i] === null || verilenCevaplar[i] === undefined) {
             finalBosSayisi++;
         } else if (verilenCevaplar[i] === dersler[i].dogruCevap) {
             finalDogruSayisi++;
@@ -309,7 +318,6 @@ function sinaviBitir() {
         }
     }
 
-    // İstatistikleri LocalStorage'a kaydet
     const userName = sessionStorage.getItem("loggedInUser");
     const quizTopic = localStorage.getItem("quizTopic");
     if (userName && quizTopic) {
@@ -323,7 +331,6 @@ function sinaviBitir() {
         stats[quizTopic].empty += finalBosSayisi;
         localStorage.setItem(`stats_${userName}`, JSON.stringify(stats));
         
-        // Backend'e puanı gönder (Her doğru 10 puan)
         let lastScoreEarned = finalDogruSayisi * 10;
         localStorage.setItem(`lastScore_${userName}`, lastScoreEarned);
         
@@ -343,7 +350,6 @@ function sinaviBitir() {
             })
         }).catch(err => console.log(err));
         
-        // Test bittiği için saved veriyi sil
         fetch('/api/test/delete', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -368,9 +374,8 @@ function sinaviBitir() {
 
 document.addEventListener("DOMContentLoaded", function() {
     const quizArea = document.getElementById("quiz-area");
-    const configArea = document.getElementById("config-area");
     
-    if (quizArea && configArea) {
+    if (quizArea) {
         const resumeMode = localStorage.getItem("resumeTestMode");
         if (resumeMode === "true") {
             localStorage.removeItem("resumeTestMode");
@@ -384,7 +389,6 @@ document.addEventListener("DOMContentLoaded", function() {
                     verilenCevaplar = data.answers;
                     mevcutSoruIndex = data.currentIndex;
                     
-                    configArea.style.display = "none";
                     quizArea.style.display = "block";
                     const navContainer = document.getElementById("nav-container");
                     if(navContainer) navContainer.style.display = "flex";
@@ -399,53 +403,48 @@ document.addEventListener("DOMContentLoaded", function() {
 
         const quizTopic = localStorage.getItem("quizTopic");
         
-        // Konu kontrolü yap (DB'den çekeceğimiz için questionsDB kontrolünü kaldırdık)
         if (quizTopic) {
-            // Ayar ekranını göster
-            configArea.style.display = "block";
             quizArea.style.display = "none";
-            
-            // Navigasyon barını ve mesaj alanını gizle
-            const navContainer = document.getElementById("nav-container");
-            if(navContainer) navContainer.style.display = "none";
-            document.getElementById("next-btn").style.display = "none";
-            document.getElementById("finish-btn").style.display = "none";
-            document.getElementById("message-area").style.display = "none";
+            startEndlessQuiz(quizTopic);
         } else {
-            // Konu seçilmemişse veya yanlışsa ana sayfaya dön
             window.location.href = "/Home/Index";
         }
     }
 });
 
-async function startWithQuestions(count) {
-    const quizTopic = localStorage.getItem("quizTopic");
-    
+async function startEndlessQuiz(topic) {
     try {
-        const res = await fetch(`/api/questions?topic=${encodeURIComponent(quizTopic)}&count=${count}`);
+        const res = await fetch(`/api/questions?topic=${encodeURIComponent(topic)}&count=1000`);
         if (!res.ok) {
             alert("Sorular yüklenirken hata oluştu veya bu konuya ait soru bulunamadı.");
             window.location.href = "/Home/Index";
             return;
         }
-        const data = await res.json();
-        dersler = data;
         
-        // Seçilen soruların şıklarını karıştır
-        dersler.forEach(q => {
+        havuzSorular = await res.json();
+        
+        if (havuzSorular.length === 0) {
+            alert("Bu konu için hiç soru bulunamadı.");
+            window.location.href = "/Home/Index";
+            return;
+        }
+
+        dersler = [];
+        verilenCevaplar = [];
+        mevcutSoruIndex = 0;
+        
+        const ilkBes = havuzSorular.splice(0, 5);
+        ilkBes.forEach(q => {
             let options = [...q.secenekler];
             for (let i = options.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [options[i], options[j]] = [options[j], options[i]];
             }
             q.secenekler = options;
+            dersler.push(q);
+            verilenCevaplar.push(null);
         });
 
-        verilenCevaplar = new Array(dersler.length).fill(null);
-        mevcutSoruIndex = 0;
-        
-        // Ayar ekranını gizle, sınav alanını göster
-        document.getElementById("config-area").style.display = "none";
         document.getElementById("quiz-area").style.display = "block";
         const navContainer = document.getElementById("nav-container");
         if(navContainer) navContainer.style.display = "flex";
@@ -453,7 +452,6 @@ async function startWithQuestions(count) {
         soruyuYukle();
     } catch(err) {
         alert("Bağlantı hatası: " + err);
+        window.location.href = "/Home/Index";
     }
 }
-
-
