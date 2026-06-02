@@ -2,10 +2,43 @@
     ViewData["Title"] = "Admin Paneli";
 }
 
-<div class="main-content" style="display: flex; justify-content: center; padding: 40px 20px;">
-    <div class="box" style="width: 100%; max-width: 800px; padding: 40px;">
-        <h2 style="margin-top: 0; color: #0f172a; text-align: center; margin-bottom: 30px;">⚙️ Admin Paneli - Soru Ekle</h2>
-        
+<style>
+    .admin-tab { display: none; }
+    .admin-tab.active { display: block; }
+    .tab-btn { background-color: #64748b; border: none; opacity: 0.7; transition: 0.3s; }
+    .tab-btn.active { background-color: #3b82f6; opacity: 1; }
+    
+    .user-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    .user-table th, .user-table td { padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+    .user-table th { background-color: #f8fafc; color: #475569; font-weight: 600; }
+    .user-table tr:hover { background-color: #f1f5f9; cursor: pointer; }
+    
+    .modal-overlay {
+        display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;
+    }
+    .modal-content {
+        background: white; width: 90%; max-width: 600px; padding: 30px; border-radius: 12px;
+        max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        position: relative;
+    }
+    .modal-close {
+        position: absolute; top: 15px; right: 15px; background: #ef4444; color: white;
+        border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer;
+        font-weight: bold;
+    }
+</style>
+
+<div class="main-content" style="display: flex; flex-direction: column; align-items: center; padding: 40px 20px;">
+    
+    <div style="display: flex; gap: 15px; margin-bottom: 30px;">
+        <button onclick="switchTab('addQuestion')" id="btn-addQuestion" class="action-btn auth-btn tab-btn active">➕ Soru Ekle</button>
+        <button onclick="switchTab('userList')" id="btn-userList" class="action-btn auth-btn tab-btn">👥 Kullanıcı Listesi</button>
+    </div>
+
+    <!-- Soru Ekleme Sekmesi -->
+    <div id="addQuestion" class="box admin-tab active" style="width: 100%; max-width: 800px; padding: 40px;">
+        <h2 style="margin-top: 0; color: #0f172a; text-align: center; margin-bottom: 30px;">⚙️ Yeni Soru Ekle</h2>
         <div id="alertMsg" style="display: none; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: 600; text-align: center;"></div>
 
         <form id="addQuestionForm" onsubmit="submitQuestion(event)">
@@ -90,6 +123,60 @@
             </button>
         </form>
     </div>
+
+    <!-- Kullanıcı Listesi Sekmesi -->
+    <div id="userList" class="box admin-tab" style="width: 100%; max-width: 1000px; padding: 40px;">
+        <h2 style="margin-top: 0; color: #0f172a; text-align: center; margin-bottom: 20px;">👥 Sistemdeki Kullanıcılar</h2>
+        <p style="text-align: center; color: #64748b; margin-bottom: 20px;">Kullanıcıların detaylarını ve sınav geçmişlerini görmek için listeden üzerlerine tıklayın.</p>
+        
+        <div style="overflow-x: auto;">
+            <table class="user-table" id="usersTableBody">
+                <thead>
+                    <tr>
+                        <th>Kullanıcı Adı</th>
+                        <th>Ad Soyad</th>
+                        <th>E-posta</th>
+                        <th>Toplam Puan</th>
+                        <th>Son Giriş</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan="5" style="text-align:center;">Yükleniyor...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal (Açılır Pencere) -->
+<div id="userModal" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <button class="modal-close" onclick="closeModal(null, true)">X</button>
+        
+        <div style="text-align: center; margin-bottom: 20px;">
+            <div style="font-size: 50px; margin-bottom: 10px;">👤</div>
+            <h2 id="modalUserName" style="margin: 0; color: #0f172a;">Kullanıcı Adı</h2>
+            <p id="modalUserEmail" style="margin: 5px 0 0 0; color: #64748b;">email@domain.com</p>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+            <div style="background: #f8fafc; padding: 15px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 13px; color: #64748b; font-weight: 600;">TOPLAM PUAN</div>
+                <div id="modalTotalScore" style="font-size: 24px; font-weight: bold; color: #3b82f6;">0</div>
+            </div>
+            <div style="background: #f8fafc; padding: 15px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 13px; color: #64748b; font-weight: 600;">YAŞ</div>
+                <div id="modalAge" style="font-size: 24px; font-weight: bold; color: #10b981;">0</div>
+            </div>
+        </div>
+
+        <h3 style="color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-top: 30px;">Sınav Geçmişi</h3>
+        <div style="max-height: 250px; overflow-y: auto; padding-right: 5px;">
+            <div id="modalExamHistory">
+                <p style="text-align: center; color: #64748b;">Yükleniyor...</p>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
@@ -99,8 +186,117 @@
             if (!userName || userName.toLowerCase() !== "admin") {
                 alert("Yetkisiz erişim! Bu sayfayı yalnızca Admin yetkisine sahip kullanıcılar görüntüleyebilir.");
                 window.location.href = "/Home/Index";
+                return;
             }
+            loadUsers();
         });
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            document.getElementById('btn-' + tabId).classList.add('active');
+        }
+
+        async function loadUsers() {
+            try {
+                const res = await fetch('/api/users/all');
+                if(!res.ok) throw new Error("API hatası");
+                const users = await res.json();
+                
+                const tbody = document.querySelector("#usersTableBody tbody");
+                tbody.innerHTML = "";
+
+                if(users.length === 0) {
+                    tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>Henüz kayıtlı kullanıcı yok.</td></tr>";
+                    return;
+                }
+
+                users.forEach(u => {
+                    const tr = document.createElement("tr");
+                    tr.onclick = () => openUserModal(u.username);
+                    tr.innerHTML = `
+                        <td style="font-weight: 600; color: #3b82f6;">${u.username}</td>
+                        <td>${u.name}</td>
+                        <td>${u.email || '-'}</td>
+                        <td style="font-weight: bold; color: #10b981;">${u.totalScore} Puan</td>
+                        <td style="font-size: 13px; color: #64748b;">${u.lastLogin}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+            } catch(e) {
+                console.error(e);
+                document.querySelector("#usersTableBody tbody").innerHTML = "<tr><td colspan='5' style='text-align:center; color: red;'>Kullanıcılar yüklenemedi.</td></tr>";
+            }
+        }
+
+        async function openUserModal(username) {
+            document.getElementById('userModal').style.display = 'flex';
+            document.getElementById('modalUserName').innerText = "Yükleniyor...";
+            document.getElementById('modalUserEmail').innerText = "";
+            document.getElementById('modalTotalScore').innerText = "...";
+            document.getElementById('modalAge').innerText = "...";
+            document.getElementById('modalExamHistory').innerHTML = '<p style="text-align: center; color: #64748b;">Yükleniyor...</p>';
+
+            try {
+                // Temel bilgileri çek
+                const userRes = await fetch(`/api/user?name=${username}`);
+                if (userRes.ok) {
+                    const userData = await userRes.json();
+                    document.getElementById('modalUserName').innerText = (userData.firstname + ' ' + userData.surname).trim() || userData.name;
+                    document.getElementById('modalUserEmail').innerText = userData.email || 'E-posta belirtilmemiş';
+                    document.getElementById('modalAge').innerText = userData.age || '-';
+                }
+
+                // Sınav geçmişini ve toplam puanı çek
+                const histRes = await fetch(`/api/user/history?username=${username}`);
+                if (histRes.ok) {
+                    const history = await histRes.json();
+                    
+                    let totalScore = 0;
+                    let historyHtml = "";
+                    
+                    if (history.length === 0) {
+                        historyHtml = '<p style="text-align: center; color: #64748b; font-style: italic;">Henüz hiçbir sınava girmemiş.</p>';
+                    } else {
+                        history.forEach(h => {
+                            totalScore += h.score;
+                            historyHtml += `
+                                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 10px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                        <strong style="color: #0f172a;">${h.topic}</strong>
+                                        <span style="background: ${h.score > 0 ? '#dcfce7' : '#fee2e2'}; color: ${h.score > 0 ? '#166534' : '#991b1b'}; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 13px;">
+                                            ${h.score} Puan
+                                        </span>
+                                    </div>
+                                    <div style="display: flex; gap: 10px; font-size: 13px; color: #64748b;">
+                                        <span>✅ ${h.correct} Doğru</span>
+                                        <span>❌ ${h.wrong} Yanlış</span>
+                                        <span>➖ ${h.empty} Boş</span>
+                                    </div>
+                                    <div style="font-size: 12px; color: #94a3b8; margin-top: 8px; text-align: right;">${h.date}</div>
+                                </div>
+                            `;
+                        });
+                    }
+                    
+                    document.getElementById('modalTotalScore').innerText = totalScore;
+                    document.getElementById('modalExamHistory').innerHTML = historyHtml;
+                }
+            } catch(e) {
+                console.error(e);
+                document.getElementById('modalUserName').innerText = "Hata oluştu";
+                document.getElementById('modalExamHistory').innerHTML = '<p style="text-align: center; color: red;">Veriler çekilemedi.</p>';
+            }
+        }
+
+        function closeModal(e, force = false) {
+            if (force || e.target.id === 'userModal') {
+                document.getElementById('userModal').style.display = 'none';
+            }
+        }
 
         async function submitQuestion(e) {
             e.preventDefault();
@@ -152,7 +348,6 @@
                     alertMsg.style.color = "#166534";
                     alertMsg.innerText = "🎉 Soru başarıyla veritabanına eklendi!";
                     
-                    // Formu sıfırla ama konuyu tut (ard arda eklemek kolay olsun)
                     document.getElementById("questionText").value = "";
                     document.getElementById("opt0").value = "";
                     document.getElementById("opt1").value = "";

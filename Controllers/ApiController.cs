@@ -56,6 +56,25 @@ namespace OnlineQuizMVC.Controllers
             return Unauthorized(new { error = "Kullanıcı adı veya şifre hatalı." });
         }
 
+        [HttpGet("users/all")]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            var users = await _context.Users
+                .Select(u => new
+                {
+                    username = u.Name,
+                    name = $"{(string.IsNullOrEmpty(u.FirstName) ? u.Name : u.FirstName)} {u.Surname}".Trim(),
+                    totalScore = u.TotalScore,
+                    lastLogin = u.LastLogin.HasValue ? u.LastLogin.Value.ToString("yyyy-MM-dd HH:mm:ss") : "Bilinmiyor",
+                    email = u.Email,
+                    age = u.Age
+                })
+                .OrderByDescending(u => u.totalScore)
+                .ToListAsync();
+
+            return Ok(users);
+        }
+
         [HttpGet("user")]
         public async Task<IActionResult> GetUser(string name)
         {
