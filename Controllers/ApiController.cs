@@ -89,7 +89,8 @@ namespace OnlineQuizMVC.Controllers
                     email = user.Email,
                     phone = user.Phone,
                     last_login = user.LastLogin?.ToString("yyyy-MM-dd HH:mm:ss"),
-                    firstname = user.FirstName
+                    firstname = user.FirstName,
+                    totalScore = user.TotalScore
                 });
             }
             return NotFound(new { error = "Kullanıcı bulunamadı." });

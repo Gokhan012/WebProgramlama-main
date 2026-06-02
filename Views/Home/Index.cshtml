@@ -222,11 +222,16 @@
                     else if(index === 1) rankClass = "silver";
                     else if(index === 2) rankClass = "bronze";
                     
+                    let userLevel = window.LevelSystem ? window.LevelSystem.getLevelFromXP(user.score) : 1;
+                    
                     lbList.innerHTML += `
                         <div class="lb-item">
                             <div class="lb-rank ${rankClass}">${index + 1}</div>
-                            <div class="lb-name">${user.name}</div>
-                            <div class="lb-score">${user.score} Puan</div>
+                            <div class="lb-name" style="display:flex; align-items:center; gap:6px;">
+                                ${user.name}
+                                <span style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: bold;">Lvl ${userLevel}</span>
+                            </div>
+                            <div class="lb-score">${user.score} XP</div>
                         </div>
                     `;
                 });
@@ -275,7 +280,7 @@
 
                 if (history.length > 0) {
                     let lastExam = history[history.length - 1];
-                    lastScoreValue = lastExam.score + " Puan";
+                    lastScoreValue = lastExam.score + " XP";
                 }
 
                 document.getElementById("dashTotalExams").innerText = uniqueTopics.size;

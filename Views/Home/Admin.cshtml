@@ -136,7 +136,7 @@
                         <th>Kullanıcı Adı</th>
                         <th>Ad Soyad</th>
                         <th>E-posta</th>
-                        <th>Toplam Puan</th>
+                        <th>Toplam XP</th>
                         <th>Son Giriş</th>
                     </tr>
                 </thead>
@@ -161,7 +161,7 @@
         
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
             <div style="background: #f8fafc; padding: 15px; border-radius: 8px; text-align: center;">
-                <div style="font-size: 13px; color: #64748b; font-weight: 600;">TOPLAM PUAN</div>
+                <div style="font-size: 13px; color: #64748b; font-weight: 600;">TOPLAM XP</div>
                 <div id="modalTotalScore" style="font-size: 24px; font-weight: bold; color: #3b82f6;">0</div>
             </div>
             <div style="background: #f8fafc; padding: 15px; border-radius: 8px; text-align: center;">
@@ -220,7 +220,7 @@
                         <td style="font-weight: 600; color: #3b82f6;">${u.username}</td>
                         <td>${u.name}</td>
                         <td>${u.email || '-'}</td>
-                        <td style="font-weight: bold; color: #10b981;">${u.totalScore} Puan</td>
+                        <td style="font-weight: bold; color: #10b981;">${u.totalScore} XP <span style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: bold; margin-left: 5px;">Lvl ${window.LevelSystem ? window.LevelSystem.getLevelFromXP(u.totalScore) : 1}</span></td>
                         <td style="font-size: 13px; color: #64748b;">${u.lastLogin}</td>
                     `;
                     tbody.appendChild(tr);
@@ -268,7 +268,7 @@
                                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                                         <strong style="color: #0f172a;">${h.topic}</strong>
                                         <span style="background: ${h.score > 0 ? '#dcfce7' : '#fee2e2'}; color: ${h.score > 0 ? '#166534' : '#991b1b'}; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 13px;">
-                                            ${h.score} Puan
+                                            ${h.score} XP
                                         </span>
                                     </div>
                                     <div style="display: flex; gap: 10px; font-size: 13px; color: #64748b;">
@@ -282,7 +282,7 @@
                         });
                     }
                     
-                    document.getElementById('modalTotalScore').innerText = totalScore;
+                    document.getElementById('modalTotalScore').innerText = totalScore + " XP (Lvl " + (window.LevelSystem ? window.LevelSystem.getLevelFromXP(totalScore) : 1) + ")";
                     document.getElementById('modalExamHistory').innerHTML = historyHtml;
                 }
             } catch(e) {

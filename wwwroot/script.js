@@ -335,20 +335,39 @@ function sinaviBitir() {
         localStorage.setItem(`lastScore_${userName}`, lastScoreEarned);
         
         let maxScore = dersler.length * 10;
-        fetch('/api/user/score', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ 
-                username: userName, 
-                addedScore: lastScoreEarned, 
-                topic: quizTopic, 
-                maxScore: maxScore,
-                totalQuestions: dersler.length,
-                correct: finalDogruSayisi,
-                wrong: finalYanlisSayisi,
-                empty: finalBosSayisi
-            })
-        }).catch(err => console.log(err));
+        
+        fetch(`/api/user?name=${userName}`).then(r => r.json()).then(userData => {
+            let oldXP = userData.totalScore || 0;
+            let oldLevel = window.LevelSystem ? window.LevelSystem.getLevelFromXP(oldXP) : 1;
+            
+            fetch('/api/user/score', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ 
+                    username: userName, 
+                    addedScore: lastScoreEarned, 
+                    topic: quizTopic, 
+                    maxScore: maxScore,
+                    totalQuestions: dersler.length,
+                    correct: finalDogruSayisi,
+                    wrong: finalYanlisSayisi,
+                    empty: finalBosSayisi
+                })
+            }).then(() => {
+                let newXP = oldXP + lastScoreEarned;
+                let newLevel = window.LevelSystem ? window.LevelSystem.getLevelFromXP(newXP) : 1;
+                if (newLevel > oldLevel) {
+                    showLevelUpModal(newLevel);
+                }
+            }).catch(err => console.log(err));
+        }).catch(() => {
+            // Hata olursa yine de skoru gönderelim
+            fetch('/api/user/score', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ username: userName, addedScore: lastScoreEarned, topic: quizTopic, maxScore, totalQuestions: dersler.length, correct: finalDogruSayisi, wrong: finalYanlisSayisi, empty: finalBosSayisi })
+            });
+        });
         
         fetch('/api/test/delete', {
             method: 'POST',
@@ -454,4 +473,33 @@ async function startEndlessQuiz(topic) {
         alert("Bağlantı hatası: " + err);
         window.location.href = "/Home/Index";
     }
+}
+
+function showLevelUpModal(level) {
+    const modal = document.createElement("div");
+    modal.style.position = "fixed";
+    modal.style.top = "0";
+    modal.style.left = "0";
+    modal.style.width = "100%";
+    modal.style.height = "100%";
+    modal.style.backgroundColor = "rgba(0,0,0,0.6)";
+    modal.style.zIndex = "9999";
+    modal.style.display = "flex";
+    modal.style.alignItems = "center";
+    modal.style.justifyContent = "center";
+    modal.style.animation = "fadeIn 0.3s ease";
+    
+    modal.innerHTML = `
+        <div style="background: white; border-radius: 16px; padding: 40px; text-align: center; max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); animation: fadeInSlide 0.4s ease-out;">
+            <div style="font-size: 60px; margin-bottom: 20px;">⭐</div>
+            <h2 style="margin: 0 0 10px 0; color: #1e293b; font-size: 28px;">Seviye Atladınız!</h2>
+            <p style="color: #64748b; font-size: 16px; margin-bottom: 30px;">Tebrikler, istikrarlı başarınız sizi yeni bir seviyeye taşıdı.</p>
+            <div style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; padding: 15px 30px; border-radius: 12px; font-weight: bold; font-size: 24px; display: inline-block; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(59,130,246,0.4);">
+                Seviye ${level}
+            </div>
+            <button onclick="this.closest('div').parentElement.remove()" style="background: #f1f5f9; color: #475569; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; font-size: 15px; transition: 0.2s;">Devam Et</button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
 }
