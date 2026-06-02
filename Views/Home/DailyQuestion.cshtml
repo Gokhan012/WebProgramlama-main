@@ -1,0 +1,178 @@
+@{
+    ViewData["Title"] = "Günün Sorusu";
+}
+
+<div class="main-content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh;">
+    <div id="qotd-container" class="box" style="width: 100%; max-width: 600px; padding: 40px; animation: fadeInSlide 0.5s ease-out;">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <div style="font-size: 50px; margin-bottom: 15px;">💡</div>
+            <h2 style="color: #0f172a; font-size: 28px; font-weight: 800; margin: 0;">Günün Sorusu</h2>
+            <p style="color: #64748b; font-size: 16px; margin-top: 10px;">Bu soruyu doğru cevaplayarak ekstra 50 puan kazanabilirsin!</p>
+        </div>
+
+        <div id="question-area" style="margin-bottom: 30px;">
+            <div id="q-text" style="font-size: 20px; font-weight: 600; color: #1e293b; line-height: 1.5; margin-bottom: 25px; text-align: center;">
+                Soru yükleniyor...
+            </div>
+            <div id="options-grid" style="display: grid; grid-template-columns: 1fr; gap: 12px;">
+                <!-- Seçenekler buraya gelecek -->
+            </div>
+        </div>
+
+        <div id="feedback-area" style="display: none; text-align: center; margin-top: 20px; padding: 15px; border-radius: 12px; animation: fadeIn 0.3s ease;">
+            <div id="feedback-text" style="font-weight: 700; font-size: 18px;"></div>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px;">
+            <a href="/Home/Index" class="restart-btn" style="display: inline-flex; align-items: center; justify-content: center; background: #f1f5f9; color: #475569; padding: 12px 24px; text-decoration: none; font-weight: 600; border-radius: 10px; transition: all 0.2s;">
+                &larr; Ana Sayfaya Dön
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/questions.js"></script>
+    <script>
+        let currentQuestion = null;
+        let answered = false;
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const userName = sessionStorage.getItem("loggedInUser");
+            if (!userName) {
+                window.location.href = "/Home/Login";
+                return;
+            }
+
+            // Bugün daha önce çözüp çözmediğini kontrol et (isteğe bağlı ama kullanıcı deneyimi için iyi)
+            const lastSolved = localStorage.getItem(`qotd_solved_${userName}`);
+            const today = new Date().toDateString();
+            
+            if (lastSolved === today) {
+                showAlreadySolved();
+            } else {
+                loadRandomQuestion();
+            }
+        });
+
+        function loadRandomQuestion() {
+            let savedQ = sessionStorage.getItem("current_qotd");
+            if (savedQ) {
+                try {
+                    currentQuestion = JSON.parse(savedQ);
+                } catch(e){}
+            }
+            if (!currentQuestion) {
+                const topics = Object.keys(questionsDB);
+                const randomTopic = topics[Math.floor(Math.random() * topics.length)];
+                const questions = questionsDB[randomTopic];
+                currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+            }
+
+            // Soruyu ekrana bas
+            document.getElementById("q-text").innerText = currentQuestion.soru;
+            
+            const optionsGrid = document.getElementById("options-grid");
+            optionsGrid.innerHTML = '';
+            
+            currentQuestion.secenekler.forEach(opt => {
+                const btn = document.createElement("button");
+                btn.className = "option-btn";
+                btn.style.width = "100%";
+                btn.style.textAlign = "left";
+                btn.style.padding = "16px 20px";
+                btn.style.border = "2px solid #e2e8f0";
+                btn.style.borderRadius = "12px";
+                btn.style.background = "white";
+                btn.style.cursor = "pointer";
+                btn.style.fontSize = "16px";
+                btn.style.transition = "all 0.2s ease";
+                btn.innerText = opt;
+                
+                btn.onmouseover = () => { if(!answered) { btn.style.borderColor = "#3b82f6"; btn.style.background = "#f8fafc"; } };
+                btn.onmouseout = () => { if(!answered && !btn.classList.contains('selected')) { btn.style.borderColor = "#e2e8f0"; btn.style.background = "white"; } };
+                
+                btn.onclick = () => checkAnswer(opt, btn);
+                optionsGrid.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedOpt, btnElement) {
+            if (answered) return;
+            answered = true;
+
+            const isCorrect = selectedOpt === currentQuestion.dogruCevap;
+            const feedbackArea = document.getElementById("feedback-area");
+            const feedbackText = document.getElementById("feedback-text");
+            const userName = sessionStorage.getItem("loggedInUser");
+
+            // Tüm butonları devre dışı bırak
+            const allBtns = document.querySelectorAll(".option-btn");
+            allBtns.forEach(btn => {
+                btn.style.cursor = "default";
+                if (btn.innerText === currentQuestion.dogruCevap) {
+                    btn.style.borderColor = "#22c55e";
+                    btn.style.background = "#f0fdf4";
+                    btn.style.color = "#166534";
+                }
+            });
+
+            if (isCorrect) {
+                btnElement.style.borderColor = "#22c55e";
+                btnElement.style.background = "#f0fdf4";
+                feedbackArea.style.display = "block";
+                feedbackArea.style.background = "#dcfce7";
+                feedbackArea.style.color = "#166534";
+                feedbackText.innerHTML = "🎉 Tebrikler! Doğru cevap. Hesabına 50 puan eklendi.";
+                
+                // Puan ekle
+                addExtraScore(userName, 50);
+            } else {
+                btnElement.style.borderColor = "#ef4444";
+                btnElement.style.background = "#fef2f2";
+                btnElement.style.color = "#991b1b";
+                feedbackArea.style.display = "block";
+                feedbackArea.style.background = "#fee2e2";
+                feedbackArea.style.color = "#991b1b";
+                feedbackText.innerHTML = "❌ Maalesef yanlış cevap. Doğru cevap yeşil ile işaretlendi.";
+            }
+
+            // Bugün çözüldü olarak işaretle
+            localStorage.setItem(`qotd_solved_${userName}`, new Date().toDateString());
+        }
+
+        function addExtraScore(username, points) {
+            fetch('/api/user/score', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: username,
+                    addedScore: points,
+                    topic: "Günün Sorusu",
+                    maxScore: points,
+                    totalQuestions: 1,
+                    correct: 1,
+                    wrong: 0,
+                    empty: 0
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                console.log("Puan eklendi:", data);
+            })
+            .catch(err => console.error("Puan eklenirken hata:", err));
+        }
+
+        function showAlreadySolved() {
+            document.getElementById("question-area").style.display = "none";
+            const feedbackArea = document.getElementById("feedback-area");
+            const feedbackText = document.getElementById("feedback-text");
+            
+            feedbackArea.style.display = "block";
+            feedbackArea.style.background = "#eff6ff";
+            feedbackArea.style.color = "#1e40af";
+            feedbackText.innerHTML = "ℹ️ Bugünün sorusunu zaten cevapladın! Yarın yeni bir soru için tekrar gel.";
+            answered = true;
+        }
+    </script>
+}

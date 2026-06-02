@@ -1,0 +1,359 @@
+@{
+    ViewData["Title"] = "Ana Ekran";
+}
+
+@section Styles {
+    <style>
+        /* Kaydırma çubuğu tasarımı */
+        .topic-grid-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .topic-grid-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9; 
+            border-radius: 10px;
+        }
+        .topic-grid-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 10px;
+        }
+        .topic-grid-scroll::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+}
+
+<div class="bento-container">
+    
+    <!-- Welcome & Stats -->
+    <div class="bento-item bento-stats">
+        <div>
+            <h2 id="welcomeText" style="margin: 0; font-size: 28px; font-weight: 800; color: #0f172a;">Hoş Geldiniz 👋</h2>
+            <p style="margin: 8px 0 0 0; color: #64748b; font-size: 15px;">Eğitim istatistikleriniz ve güncel durumunuz.</p>
+        </div>
+        <div class="stats-row">
+            <div class="stat-box blue">
+                <div class="stat-value" id="dashTotalExams">0</div>
+                <div class="stat-label">Çözülen Sınav</div>
+            </div>
+            <div class="stat-box green">
+                <div class="stat-value" id="dashSuccessRate">%0</div>
+                <div class="stat-label">Başarı Oranı</div>
+            </div>
+            <div class="stat-box purple">
+                <div class="stat-value" id="dashLastScore">-</div>
+                <div class="stat-label">Son Skor</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Question of the Day -->
+    <div class="bento-item bento-qotd">
+        <h3 class="qotd-title">💡 Günün Sorusu</h3>
+        <p id="qotd-preview-text" class="qotd-desc">Modern ECMAScript standartlarında 'sabit' bir değişken tanımlamak için hangisi kullanılır?</p>
+        <button class="qotd-btn" onclick="window.location.href='/Home/DailyQuestion'">Hemen Çöz</button>
+    </div>
+
+    <!-- Categories -->
+    <div class="bento-item bento-categories" style="grid-column: span 2;">
+        <div id="unfinishedTestBanner"></div>
+        
+        <div id="step1" style="animation: fadeIn 0.3s ease;">
+            <h3 style="margin: 0 0 20px 0; font-size: 20px; color: #0f172a;">Kategoriler</h3>
+            
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                <div class="img-card" onclick="selectCourse('Yazılım')" style="position: relative;">
+                    <div style="font-size: 40px; margin-bottom: 10px;">💻</div>
+                    <span style="font-weight: 600;">Yazılım</span>
+                    <div class="progress-bg"><div class="progress-fill" id="prog-Yazılım" style="width: 0%;"></div></div>
+                </div>
+                <div class="img-card" onclick="selectCourse('Matematik')" style="position: relative;">
+                    <div style="font-size: 40px; margin-bottom: 10px;">📐</div>
+                    <span style="font-weight: 600;">Matematik</span>
+                    <div class="progress-bg"><div class="progress-fill" id="prog-Matematik" style="width: 0%;"></div></div>
+                </div>
+                <div class="img-card" onclick="selectCourse('Fizik')" style="position: relative;">
+                    <div style="font-size: 40px; margin-bottom: 10px;">⚛️</div>
+                    <span style="font-weight: 600;">Fizik</span>
+                    <div class="progress-bg"><div class="progress-fill" id="prog-Fizik" style="width: 0%;"></div></div>
+                </div>
+                <div class="img-card" onclick="selectCourse('Tarih')" style="position: relative;">
+                    <div style="font-size: 40px; margin-bottom: 10px;">🏛️</div>
+                    <span style="font-weight: 600;">Tarih</span>
+                    <div class="progress-bg"><div class="progress-fill" id="prog-Tarih" style="width: 0%;"></div></div>
+                </div>
+                <div class="img-card" onclick="selectCourse('Genel Kültür')" style="position: relative;">
+                    <div style="font-size: 40px; margin-bottom: 10px;">🌍</div>
+                    <span style="font-weight: 600;">Genel Kültür</span>
+                    <div class="progress-bg"><div class="progress-fill" id="prog-Genel Kültür" style="width: 0%;"></div></div>
+                </div>
+                <div class="img-card" onclick="selectCourse('Yabancı Dil')" style="position: relative;">
+                    <div style="font-size: 40px; margin-bottom: 10px;">🗣️</div>
+                    <span style="font-weight: 600;">Yabancı Dil</span>
+                    <div class="progress-bg"><div class="progress-fill" id="prog-Yabancı Dil" style="width: 0%;"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="step2" style="display: none; animation: fadeInSlide 0.3s ease;">
+            <button onclick="goBack()" class="restart-btn" style="margin-bottom: 20px; padding: 8px 12px; font-size: 13px;">
+                &larr; Geri Dön
+            </button>
+            <div style="font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 15px;">Alt Konu Seçimi (<span id="selectedCourseLabel" style="color: #3b82f6;"></span>)</div>
+            <div id="topicGrid" class="topic-grid-scroll" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-height: 380px; overflow-y: auto; padding-right: 5px; padding-bottom: 5px;">
+            </div>
+            <button id="startBtn" onclick="startQuiz()" class="action-btn auth-btn" style="display: none; background-color: #3b82f6; border: none; cursor: pointer; font-weight: 600; width: 100%; margin-top: 25px;">
+                🚀 Sınava Başla
+            </button>
+        </div>
+    </div>
+
+    <!-- Leaderboard -->
+    <div class="bento-item bento-leaderboard">
+        <h3 style="margin: 0 0 5px 0; font-size: 20px; color: #0f172a;">🏆 Liderlik Tablosu</h3>
+        <p style="color: #64748b; font-size: 13px; margin: 0 0 15px 0;">Platformun en başarılı üyeleri</p>
+        <div class="lb-list" id="realLeaderboardList">
+            <div style="text-align: center; color: #94a3b8; font-size: 14px; margin-top: 20px;">Kullanıcılar yükleniyor...</div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script src="~/questions.js"></script>
+    <script>
+        const courseData = {
+            "Yazılım": [
+                { name: "HTML & CSS Temelleri", icon: "🌐" },
+                { name: "JavaScript İleri Seviye", icon: "⚡" },
+                { name: "Python ile Veri Bilimi", icon: "🐍" },
+                { name: "C# ve .NET Core", icon: "⚙️" },
+                { name: "Veritabanı (SQL)", icon: "💾" }
+            ],
+            "Matematik": [
+                { name: "Türev ve Uygulamaları", icon: "📉" },
+                { name: "İntegral", icon: "📈" },
+                { name: "Trigonometri", icon: "📐" },
+                { name: "Matris ve Determinant", icon: "📊" },
+                { name: "Olasılık", icon: "🎲" }
+            ],
+            "Fizik": [
+                { name: "Mekanik ve Dinamik", icon: "⚙️" },
+                { name: "Elektrik ve Manyetizma", icon: "💡" },
+                { name: "Optik", icon: "🌈" },
+                { name: "Modern Fizik", icon: "⚛️" }
+            ],
+            "Tarih": [
+                { name: "Osmanlı Devleti Yükseliş", icon: "🕌" },
+                { name: "İnkılap Tarihi", icon: "📜" },
+                { name: "İlk Çağ Uygarlıkları", icon: "🏛️" },
+                { name: "Soğuk Savaş Dönemi", icon: "🌍" }
+            ],
+            "Genel Kültür": [
+                { name: "Dünya Başkentleri", icon: "🗺️" },
+                { name: "Sanat ve Edebiyat", icon: "🎭" },
+                { name: "Sinema Tarihi", icon: "🎬" },
+                { name: "Güncel Olaylar", icon: "📰" }
+            ],
+            "Yabancı Dil": [
+                { name: "İngilizce Grammar", icon: "📝" },
+                { name: "Günlük Konuşma", icon: "🗣️" },
+                { name: "İş İngilizcesi", icon: "💼" },
+                { name: "Kelime Bilgisi", icon: "📚" }
+            ]
+        };
+
+        let selectedCourse = null;
+        let selectedTopic = null;
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const userName = sessionStorage.getItem("loggedInUser");
+            if (!userName) {
+                window.location.href = "/Home/Login";
+                return;
+            }
+            document.getElementById("welcomeText").innerText = "Merhaba, " + userName + " 👋";
+            
+            // Veritabanından gerçek ad/soyadı çek
+            fetch(`/api/user?name=${userName}`)
+            .then(res => res.json())
+            .then(data => {
+                if(!data.error && (data.firstname || data.surname)) {
+                    const fullName = `${data.firstname} ${data.surname}`.trim();
+                    document.getElementById("welcomeText").innerText = "Merhaba, " + fullName + " 👋";
+                }
+            })
+            .catch(err => console.log(err));
+            
+            checkUnfinishedTest("unfinishedTestBanner");
+            loadDashboardStats(userName);
+            loadRealLeaderboard();
+            loadQotdPreview();
+        });
+
+        function loadQotdPreview() {
+            const topics = Object.keys(questionsDB);
+            const randomTopic = topics[Math.floor(Math.random() * topics.length)];
+            const questions = questionsDB[randomTopic];
+            const randomQ = questions[Math.floor(Math.random() * questions.length)];
+            
+            // Seçilen soruyu çözme sayfasına aktarmak için geçici olarak sakla
+            sessionStorage.setItem("current_qotd", JSON.stringify(randomQ));
+            
+            document.getElementById("qotd-preview-text").innerText = randomQ.soru;
+        }
+
+        function loadRealLeaderboard() {
+            fetch('/api/leaderboard')
+            .then(res => res.json())
+            .then(data => {
+                const lbList = document.getElementById("realLeaderboardList");
+                if(data.error || data.length === 0) {
+                    lbList.innerHTML = '<div style="text-align: center; color: #94a3b8; font-size: 14px; margin-top: 20px;">Henüz kimse skor üretmemiş.</div>';
+                    return;
+                }
+                
+                lbList.innerHTML = '';
+                data.forEach((user, index) => {
+                    let rankClass = "";
+                    if(index === 0) rankClass = "gold";
+                    else if(index === 1) rankClass = "silver";
+                    else if(index === 2) rankClass = "bronze";
+                    
+                    lbList.innerHTML += `
+                        <div class="lb-item">
+                            <div class="lb-rank ${rankClass}">${index + 1}</div>
+                            <div class="lb-name">${user.name}</div>
+                            <div class="lb-score">${user.score} Puan</div>
+                        </div>
+                    `;
+                });
+            })
+            .catch(err => console.log(err));
+        }
+
+        function loadDashboardStats(userName) {
+            const categoryMapping = {
+                "Yazılım": ["HTML & CSS Temelleri", "JavaScript İleri Seviye", "Python ile Veri Bilimi", "C# ve .NET Core", "Veritabanı (SQL)"],
+                "Matematik": ["Türev ve Uygulamaları", "İntegral", "Trigonometri", "Matris ve Determinant", "Olasılık"],
+                "Fizik": ["Mekanik ve Dinamik", "Elektrik ve Manyetizma", "Optik", "Modern Fizik"],
+                "Tarih": ["Osmanlı Devleti Yükseliş", "İnkılap Tarihi", "İlk Çağ Uygarlıkları", "Soğuk Savaş Dönemi"],
+                "Genel Kültür": ["Dünya Başkentleri", "Sanat ve Edebiyat", "Sinema Tarihi", "Güncel Olaylar"],
+                "Yabancı Dil": ["İngilizce Grammar", "Günlük Konuşma", "İş İngilizcesi", "Kelime Bilgisi"]
+            };
+
+            let catQuestions = {"Yazılım": 0, "Matematik": 0, "Fizik": 0, "Tarih": 0, "Genel Kültür": 0, "Yabancı Dil": 0};
+
+            fetch(`/api/user/history?username=${userName}`)
+            .then(res => res.json())
+            .then(history => {
+                if(!history || history.error || history.length === 0) return;
+
+                let totalCorrect = 0;
+                let totalQuestions = 0;
+                let topicsCount = 0;
+                let uniqueTopics = new Set();
+                let lastScoreValue = "-";
+
+                history.forEach(h => {
+                    let d = h.correct || Math.round(h.score / 10);
+                    let t = h.totalQuestions || Math.round(h.maxScore / 10);
+                    
+                    totalCorrect += d;
+                    totalQuestions += t;
+                    uniqueTopics.add(h.topic);
+
+                    for(let cat in categoryMapping) {
+                        if(categoryMapping[cat].includes(h.topic)) {
+                            catQuestions[cat] += t;
+                            break;
+                        }
+                    }
+                });
+
+                if (history.length > 0) {
+                    let lastExam = history[history.length - 1];
+                    lastScoreValue = lastExam.score + " Puan";
+                }
+
+                document.getElementById("dashTotalExams").innerText = uniqueTopics.size;
+                
+                if (totalQuestions > 0) {
+                    let rate = Math.round((totalCorrect / totalQuestions) * 100);
+                    document.getElementById("dashSuccessRate").innerText = "%" + rate;
+                }
+                
+                document.getElementById("dashLastScore").innerText = lastScoreValue;
+
+                // Progress bar güncellemesi (her 50 soru çözüldüğünde çubuk dolar)
+                for(let cat in catQuestions) {
+                    let progEl = document.getElementById("prog-" + cat);
+                    if(progEl) {
+                        let p = Math.min(100, Math.round((catQuestions[cat] / 50) * 100));
+                        progEl.style.width = p + "%";
+                    }
+                }
+            })
+            .catch(err => console.error(err));
+        }
+
+        function selectCourse(course) {
+            selectedCourse = course;
+            selectedTopic = null;
+            
+            const topicGrid = document.getElementById("topicGrid");
+            topicGrid.innerHTML = ''; 
+            
+            courseData[course].forEach(topicObj => {
+                const card = document.createElement("div");
+                card.className = "img-card";
+                card.style.padding = "15px 10px";
+                card.onclick = () => selectTopic(topicObj.name, card);
+                
+                card.innerHTML = `
+                    <div style="font-size: 55px; margin-bottom: 15px; line-height: 1; transition: transform 0.2s ease;">${topicObj.icon}</div>
+                    <span style="font-size: 13px; line-height: 1.3;">${topicObj.name}</span>
+                `;
+                topicGrid.appendChild(card);
+            });
+            
+            document.getElementById("selectedCourseLabel").innerText = course;
+            
+            document.getElementById("step1").style.display = "none";
+            document.getElementById("step2").style.display = "block";
+            document.getElementById("startBtn").style.display = "none";
+        }
+
+        function selectTopic(topicName, cardElement) {
+            selectedTopic = topicName;
+            
+            const allCards = document.querySelectorAll("#topicGrid .img-card");
+            allCards.forEach(c => {
+                c.style.borderColor = "#e2e8f0";
+                c.style.background = "#f8fafc";
+            });
+            
+            cardElement.style.borderColor = "#3b82f6";
+            cardElement.style.background = "#eff6ff";
+            
+            const startBtn = document.getElementById("startBtn");
+            startBtn.style.display = "block";
+            startBtn.style.animation = "fadeIn 0.3s ease";
+        }
+
+        function goBack() {
+            selectedCourse = null;
+            selectedTopic = null;
+            document.getElementById("step2").style.display = "none";
+            document.getElementById("step1").style.display = "block";
+        }
+
+        function startQuiz() {
+            if (selectedCourse && selectedTopic) {
+                localStorage.setItem("quizCourse", selectedCourse);
+                localStorage.setItem("quizTopic", selectedTopic);
+                localStorage.removeItem("quizAnswers");
+                window.location.href = "/Home/Quiz";
+            }
+        }
+    </script>
+}

@@ -1,0 +1,39 @@
+@{
+    ViewData["Title"] = "Giriş Yap";
+}
+
+<div class="main-content">
+    <div class="box auth-box">
+        <h3><span>Hoş Geldiniz</span>Giriş Yapın</h3>
+        
+        <form id="loginForm" class="auth-form">
+            <div class="form-group">
+                <label for="loginName">Kullanıcı Adı</label>
+                <input type="text" id="loginName" class="form-control" required autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Şifre</label>
+                <input type="password" id="loginPassword" class="form-control" required>
+            </div>
+            
+            <button type="submit" class="action-btn auth-btn">Giriş Yap</button>
+        </form>
+        
+        <div id="auth-message-area"></div>
+        
+        <div class="auth-links">
+            Hesabınız yok mu? <a href="/Home/Register">Kayıt olun</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="module" src="~/js/pages/auth.js?v=3"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            if (sessionStorage.getItem("loggedInUser")) {
+                window.location.href = "/Home/Index";
+            }
+        });
+    </script>
+}

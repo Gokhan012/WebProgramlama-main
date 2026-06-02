@@ -1,0 +1,590 @@
+@{
+    ViewData["Title"] = "Profilim";
+}
+
+@section Styles {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .profile-container {
+            display: flex;
+            gap: 30px;
+            width: 1200px;
+            max-width: 95%;
+            margin: 40px auto;
+            align-items: flex-start;
+        }
+        
+        .profile-sidebar {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 30px 20px;
+            width: 280px;
+            text-align: center;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+
+        .profile-avatar-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px auto;
+        }
+
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #3b82f6;
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
+            background-color: #f1f5f9;
+        }
+
+        .upload-btn {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+
+        .upload-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .profile-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0 0 5px 0;
+        }
+        
+        .profile-email {
+            font-size: 14px;
+            color: #64748b;
+            margin: 0 0 20px 0;
+        }
+
+        .profile-stats-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .profile-stats-card span {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .profile-main {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 30px;
+            flex-grow: 1;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-top: 0;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            max-height: 550px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        /* Kaydırma çubuğu tasarımı */
+        .stats-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+        .stats-grid::-webkit-scrollbar-track {
+            background: #f1f5f9; 
+            border-radius: 10px;
+        }
+        .stats-grid::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 10px;
+        }
+        .stats-grid::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        .topic-stat-box {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.2s;
+        }
+
+        .topic-stat-box:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        .topic-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .topic-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .topic-total {
+            background: #eff6ff;
+            color: #3b82f6;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .topic-details {
+            display: flex;
+            gap: 15px;
+        }
+
+        .detail-item {
+            flex: 1;
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .detail-value {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .correct { color: #10b981; }
+        .wrong { color: #ef4444; }
+        .empty { color: #f59e0b; }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #64748b;
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .profile-container {
+                flex-direction: column;
+            }
+            .profile-sidebar {
+                width: 100%;
+                box-sizing: border-box;
+            }
+        }
+    </style>
+}
+
+<div class="profile-container">
+    <!-- SOL: Profil Kartı -->
+    <div class="profile-sidebar">
+        <div class="profile-avatar-container">
+            <img id="profileImage" src="~/images/default_avatar.png" alt="Profil Fotoğrafı" class="profile-avatar" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23cbd5e1\'><path d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/></svg>'">
+            <button class="upload-btn" onclick="document.getElementById('fileInput').click()" title="Fotoğrafı Değiştir">📷</button>
+            <input type="file" id="fileInput" style="display: none;" accept="image/*" onchange="uploadImage(event)">
+        </div>
+        
+        <h2 id="profileName" class="profile-name">Kullanıcı Adı</h2>
+        <p id="profileRole" class="profile-email">Mail Eklenmemiş</p>
+        <button onclick="openEditModal()" class="action-btn auth-btn" style="background-color: #f1f5f9; color: #475569; width: 100%; border: none; margin-bottom: 20px; font-size: 13px; padding: 8px;">✏️ Profili Düzenle</button>
+
+        <div class="profile-stats-card" style="margin-top: 10px;">
+            <span style="color: #64748b; font-weight: normal;">Toplam Çözülen</span>
+            <span id="totalQuestionsStat">0 Soru</span>
+        </div>
+        <div class="profile-stats-card">
+            <span style="color: #64748b; font-weight: normal;">Genel Başarı</span>
+            <span id="successRateStat" style="color: #10b981;">0%</span>
+        </div>
+    </div>
+
+    <!-- ORTA: İstatistikler -->
+    <div class="profile-main" style="flex: 1;">
+        <div id="unfinishedTestBanner"></div>
+        <h3 class="section-title">📈 Performans Analizi</h3>
+        
+        <div id="chartContainer" style="display: none; margin-bottom: 10px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+            <div style="display: flex; flex-direction: column; gap: 40px;">
+                <div>
+                    <h4 style="margin-top: 0; text-align: center; color: #334155; font-size: 16px;">Konulara Göre Başarı Tablosu</h4>
+                    <div style="max-height: 250px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
+                        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+                            <thead style="background: #f8fafc; position: sticky; top: 0;">
+                                <tr>
+                                    <th style="padding: 10px; border-bottom: 1px solid #e2e8f0; color: #475569; font-weight: 600;">Konu</th>
+                                    <th style="padding: 10px; border-bottom: 1px solid #e2e8f0; color: #475569; font-weight: 600; text-align: center;">Toplam</th>
+                                    <th style="padding: 10px; border-bottom: 1px solid #e2e8f0; color: #10b981; font-weight: 600; text-align: center;">Doğru</th>
+                                    <th style="padding: 10px; border-bottom: 1px solid #e2e8f0; color: #ef4444; font-weight: 600; text-align: center;">Yanlış</th>
+                                    <th style="padding: 10px; border-bottom: 1px solid #e2e8f0; color: #f59e0b; font-weight: 600; text-align: center;">Boş</th>
+                                </tr>
+                            </thead>
+                            <tbody id="topicTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div>
+                    <h4 style="margin-top: 0; text-align: center; color: #334155; font-size: 16px;">Günlük Çözülen Soru Sayısı</h4>
+                    <canvas id="dailyBarChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SAĞ: Önceki Test Sonuçları -->
+    <div class="profile-main" style="flex: 1;">
+        <h3 class="section-title">📝 Önceki Test Sonuçları</h3>
+        <div id="statsGrid" class="stats-grid">
+            <!-- JS Dolduracak -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <div style="font-size: 40px; margin-bottom: 15px;">📝</div>
+                <div>Henüz hiç test çözmediniz. Sınava başladıkça istatistikleriniz burada görünecektir.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div id="editModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div class="box" style="width: 400px; position: relative;">
+        <button onclick="closeEditModal()" style="position: absolute; right: 15px; top: 15px; background: none; border: none; font-size: 20px; cursor: pointer;">&times;</button>
+        <h3 style="margin-top: 0;">Profili Düzenle</h3>
+        
+        <div class="form-group" style="display: flex; gap: 10px;">
+            <div style="flex: 1;">
+                <label>Ad</label>
+                <input type="text" id="editFirstName" class="form-control">
+            </div>
+            <div style="flex: 1;">
+                <label>Soyad</label>
+                <input type="text" id="editSurname" class="form-control">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Yaş</label>
+            <input type="number" id="editAge" class="form-control">
+        </div>
+        <div class="form-group">
+            <label>Mail Adresi</label>
+            <input type="email" id="editEmail" class="form-control">
+        </div>
+        <div class="form-group">
+            <label>Telefon Numarası</label>
+            <input type="tel" id="editPhone" class="form-control">
+        </div>
+        
+        <button onclick="saveProfile()" class="action-btn auth-btn" style="background-color: #3b82f6;">Kaydet</button>
+        <div id="editMessage" style="margin-top: 10px; font-size: 13px; font-weight: 600; text-align: center;"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const userName = sessionStorage.getItem("loggedInUser");
+            if (!userName) {
+                window.location.href = "/Home/Login";
+                return;
+            }
+
+            // Kullanıcı bilgilerini yerleştir
+            document.getElementById("profileName").innerText = userName;
+
+            // Profil resmini yükle
+            const savedImage = localStorage.getItem(`pfp_${userName}`);
+            if (savedImage) {
+                document.getElementById("profileImage").src = savedImage;
+            }
+
+            // Profil verilerini veritabanından çek
+            fetch(`/api/user?name=${userName}`)
+            .then(res => res.json())
+            .then(data => {
+                if(!data.error) {
+                    if (data.email) document.getElementById("profileRole").innerText = data.email;
+                    
+                    let fullName = userName;
+                    if (data.firstname || data.surname) {
+                        fullName = `${data.firstname} ${data.surname}`.trim();
+                    }
+                    document.getElementById("profileName").innerText = fullName;
+
+                    document.getElementById("editFirstName").value = data.firstname || "";
+                    document.getElementById("editSurname").value = data.surname || "";
+                    document.getElementById("editAge").value = data.age || "";
+                    document.getElementById("editEmail").value = data.email || "";
+                    document.getElementById("editPhone").value = data.phone || "";
+                }
+            });
+
+            // İstatistikleri yükle
+            loadStatistics(userName);
+            
+            // Yarım kalan test var mı kontrol et
+            checkUnfinishedTest("unfinishedTestBanner");
+        });
+
+        function openEditModal() {
+            document.getElementById("editMessage").innerText = "";
+            document.getElementById("editModal").style.display = "flex";
+        }
+
+        function closeEditModal() {
+            document.getElementById("editModal").style.display = "none";
+        }
+
+        function saveProfile() {
+            const userName = sessionStorage.getItem("loggedInUser");
+            const firstname = document.getElementById("editFirstName").value;
+            const surname = document.getElementById("editSurname").value;
+            const age = document.getElementById("editAge").value;
+            const email = document.getElementById("editEmail").value;
+            const phone = document.getElementById("editPhone").value;
+            const msg = document.getElementById("editMessage");
+            
+            fetch('/api/user/update', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ name: userName, firstname, surname, age, email, phone })
+            })
+            .then(res => res.json().then(data => ({status: res.status, body: data})))
+            .then(res => {
+                if(res.status === 200) {
+                    msg.style.color = "#10b981";
+                    msg.innerText = "✅ Başarıyla kaydedildi!";
+                    if (email) document.getElementById("profileRole").innerText = email;
+                    
+                    let fullName = userName;
+                    if (firstname || surname) fullName = `${firstname} ${surname}`.trim();
+                    document.getElementById("profileName").innerText = fullName;
+                    
+                    setTimeout(closeEditModal, 1500);
+                } else {
+                    msg.style.color = "#ef4444";
+                    msg.innerText = "❌ " + (res.body.error || "Hata oluştu.");
+                }
+            })
+            .catch(err => {
+                msg.style.color = "#ef4444";
+                msg.innerText = "❌ Sunucu hatası.";
+            });
+        }
+
+        function uploadImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const base64Image = e.target.result;
+                    document.getElementById("profileImage").src = base64Image;
+                    const userName = sessionStorage.getItem("loggedInUser");
+                    localStorage.setItem(`pfp_${userName}`, base64Image); // LocalStorage'a kaydet
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function loadStatistics(userName) {
+            const statsGrid = document.getElementById("statsGrid");
+            const emptyState = document.getElementById("emptyState");
+            
+            fetch(`/api/user/history?username=${userName}`)
+            .then(res => res.json())
+            .then(history => {
+                if(!history || history.error || history.length === 0) {
+                    emptyState.style.display = "block";
+                    return;
+                }
+
+                let stats = {};
+                let dailyStats = {};
+                
+                history.forEach(h => {
+                    // Aggregate topics
+                    if(!stats[h.topic]) {
+                        stats[h.topic] = { total: 0, correct: 0, wrong: 0, empty: 0 };
+                    }
+                    stats[h.topic].total += h.totalQuestions || Math.round(h.maxScore / 10);
+                    stats[h.topic].correct += h.correct || Math.round(h.score / 10);
+                    stats[h.topic].wrong += h.wrong || 0;
+                    stats[h.topic].empty += h.empty || 0;
+
+                    // Aggregate daily
+                    let day = h.date.split(' ')[0];
+                    if(!dailyStats[day]) dailyStats[day] = 0;
+                    dailyStats[day] += h.totalQuestions || Math.round(h.maxScore / 10);
+                });
+
+                let globalTotal = 0;
+                let globalCorrect = 0;
+
+                let topicLabels = [];
+                let totalData = [];
+                let correctData = [];
+                let wrongData = [];
+                let emptyData = [];
+
+                // Verileri toplam soru sayısına göre çoktan aza sıralamak için diziye alalım
+                let statsArray = Object.entries(stats).map(([topic, data]) => ({topic, ...data}));
+                statsArray.sort((a, b) => b.total - a.total);
+
+                for (const item of statsArray) {
+                    globalTotal += item.total;
+                    globalCorrect += item.correct;
+
+                    topicLabels.push(item.topic);
+                    totalData.push(item.total);
+                    correctData.push(item.correct);
+                    wrongData.push(item.wrong);
+                    emptyData.push(item.empty);
+                }
+
+                // Sınav geçmişini en sondan (en yeniden) başa doğru listele
+                const reversedHistory = [...history].reverse();
+                reversedHistory.forEach(h => {
+                    const box = document.createElement("div");
+                    box.className = "topic-stat-box";
+                    
+                    let dateStr = h.date;
+                    let t = h.totalQuestions || Math.round(h.maxScore / 10);
+                    let c = h.correct || Math.round(h.score / 10);
+                    let w = h.wrong || 0;
+                    let e = h.empty || 0;
+
+                    box.innerHTML = `
+                        <div class="topic-header">
+                            <div class="topic-title" style="display: flex; align-items: center; gap: 8px;">
+                                ${h.topic} 
+                                <span style="font-size: 11px; color: #64748b; font-weight: normal; background: #f1f5f9; padding: 2px 6px; border-radius: 4px;">🕒 ${dateStr}</span>
+                            </div>
+                            <div class="topic-total">${t} Soru</div>
+                        </div>
+                        <div class="topic-details">
+                            <div class="detail-item">
+                                <div class="detail-value correct">${c}</div>
+                                <div class="detail-label">Doğru</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-value wrong">${w}</div>
+                                <div class="detail-label">Yanlış</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-value empty">${e}</div>
+                                <div class="detail-label">Boş</div>
+                            </div>
+                        </div>
+                    `;
+                    statsGrid.appendChild(box);
+                });
+
+                // Genel istatistikleri güncelle
+                document.getElementById("totalQuestionsStat").innerText = `${globalTotal} Soru`;
+                const successRate = globalTotal > 0 ? Math.round((globalCorrect / globalTotal) * 100) : 0;
+                document.getElementById("successRateStat").innerText = `%${successRate}`;
+
+                // Konulara Göre Başarı Tablosunu Çiz
+                if (topicLabels.length > 0) {
+                    document.getElementById('chartContainer').style.display = 'block';
+                    const tbody = document.getElementById('topicTableBody');
+                    tbody.innerHTML = '';
+                    
+                    for (let i = 0; i < topicLabels.length; i++) {
+                        const tr = document.createElement('tr');
+                        tr.style.borderBottom = "1px solid #f1f5f9";
+                        
+                        tr.innerHTML = `
+                            <td style="padding: 10px; color: #1e293b; font-weight: 500;">${topicLabels[i]}</td>
+                            <td style="padding: 10px; text-align: center; font-weight: 600; color: #3b82f6;">${totalData[i]}</td>
+                            <td style="padding: 10px; text-align: center; color: #10b981; font-weight: 600;">${correctData[i]}</td>
+                            <td style="padding: 10px; text-align: center; color: #ef4444; font-weight: 600;">${wrongData[i]}</td>
+                            <td style="padding: 10px; text-align: center; color: #f59e0b; font-weight: 600;">${emptyData[i]}</td>
+                        `;
+                        // Hover efekti ekleyelim
+                        tr.onmouseover = function() { this.style.backgroundColor = '#f8fafc'; }
+                        tr.onmouseout = function() { this.style.backgroundColor = 'transparent'; }
+                        
+                        tbody.appendChild(tr);
+                    }
+                }
+
+                // Sütun Grafiği (Günlük Çözülen Soru Sayısı)
+                let barLabels = Object.keys(dailyStats).sort();
+                let barData = barLabels.map(d => dailyStats[d]);
+                
+                const ctxBar = document.getElementById('dailyBarChart').getContext('2d');
+                new Chart(ctxBar, {
+                    type: 'bar',
+                    data: {
+                        labels: barLabels,
+                        datasets: [{
+                            label: 'Çözülen Soru Sayısı',
+                            data: barData,
+                            backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 1,
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { stepSize: 1 }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            }).catch(err => console.log("History fetch error:", err));
+        }
+    </script>
+}

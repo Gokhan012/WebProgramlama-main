@@ -1,0 +1,58 @@
+@{
+    ViewData["Title"] = "Kayıt Ol";
+}
+
+<div class="main-content">
+    <div class="box auth-box">
+        <h3><span>Aramıza Katılın</span>Hesap Oluşturun</h3>
+        
+        <form id="registerForm" class="auth-form">
+            <div class="form-group" style="text-align: left;">
+                <label for="regName">Kullanıcı Adı (Giriş İçin) *</label>
+                <input type="text" id="regName" class="form-control" required autocomplete="off" minlength="3" maxlength="30">
+            </div>
+
+            <div class="form-group" style="text-align: left;">
+                <label for="regFirstName">Adınız</label>
+                <input type="text" id="regFirstName" class="form-control" maxlength="50">
+            </div>
+
+            <div class="form-group" style="text-align: left;">
+                <label for="regSurname">Soyadınız</label>
+                <input type="text" id="regSurname" class="form-control" maxlength="50">
+            </div>
+            
+            <div class="form-group" style="text-align: left;">
+                <label for="regAge">Yaş</label>
+                <input type="number" id="regAge" class="form-control" min="5" max="120">
+            </div>
+
+            <div class="form-group" style="text-align: left;">
+                <label for="regPhone">Telefon</label>
+                <input type="tel" id="regPhone" class="form-control" maxlength="20">
+            </div>
+            
+            <div class="form-group" style="text-align: left;">
+                <label for="regEmail">Mail Adresi</label>
+                <input type="email" id="regEmail" class="form-control" maxlength="100">
+            </div>
+            
+            <div class="form-group" style="text-align: left;">
+                <label for="regPassword">Şifre *</label>
+                <input type="password" id="regPassword" class="form-control" required minlength="6" maxlength="50">
+            </div>
+            
+            <button type="submit" class="action-btn auth-btn" style="background-color: #22c55e;">Kayıt Ol</button>
+        </form>
+        
+        <div id="auth-message-area"></div>
+        
+        <div class="auth-links">
+            Zaten hesabınız var mı? <a href="/Home/Login">Giriş yapın</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="module" src="~/js/pages/auth.js"></script>
+}

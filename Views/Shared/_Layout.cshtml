@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Online Quiz</title>
+    
+    <!-- Base Styles & Components -->
+    <link rel="stylesheet" href="~/css/abstracts/_variables.css" />
+    
+    <!-- Main Style (Legacy/Merged) -->
+    <link rel="stylesheet" href="~/style.css?v=5" />
+    
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    <div class="navbar">
+        <div class="navbar-brand" style="cursor: pointer;" onclick="window.location.href='/'">🎓 Online Quiz Sistemi</div>
+        <div style="display: flex; gap: 10px; align-items: center;" id="nav-auth-section">
+            <!-- Navigation links will be handled by auth-handler.js -->
+        </div>
+    </div>
+
+    <div class="container-fluid p-0">
+        @RenderBody()
+    </div>
+
+    <div class="footer">
+        2026 Online Quiz Platformu - Tüm Hakları Saklıdır
+    </div>
+
+    <!-- Global Utility Scripts -->
+    <script type="module" src="~/js/utils.js?v=2"></script>
+    <script type="module" src="~/js/modules/auth-handler.js?v=2"></script>
+    
+    <script src="~/script.js?v=4"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+
