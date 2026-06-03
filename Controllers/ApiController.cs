@@ -216,15 +216,32 @@ namespace OnlineQuizMVC.Controllers
         [HttpGet("leaderboard")]
         public async Task<IActionResult> GetLeaderboard()
         {
-            var leaderboard = await _context.Users
-                .OrderByDescending(u => u.TotalScore)
-                .Take(5)
-                .Select(u => new
+            var oneWeekAgo = DateTime.Now.AddDays(-7);
+
+            var weeklyScores = await _context.ExamHistories
+                .Where(h => h.Date >= oneWeekAgo)
+                .GroupBy(h => h.Username)
+                .Select(g => new
                 {
-                    name = $"{(string.IsNullOrEmpty(u.FirstName) ? u.Name : u.FirstName)} {u.Surname}".Trim(),
-                    score = u.TotalScore
+                    Username = g.Key,
+                    Score = g.Sum(h => h.Score)
                 })
+                .OrderByDescending(s => s.Score)
+                .Take(5)
                 .ToListAsync();
+
+            var usernames = weeklyScores.Select(w => w.Username).ToList();
+            var users = await _context.Users
+                .Where(u => usernames.Contains(u.Name))
+                .ToListAsync();
+
+            var leaderboard = weeklyScores.Select(w => {
+                var u = users.FirstOrDefault(x => x.Name == w.Username);
+                return new {
+                    name = u != null ? $"{(string.IsNullOrEmpty(u.FirstName) ? u.Name : u.FirstName)} {u.Surname}".Trim() : w.Username,
+                    score = w.Score
+                };
+            }).ToList();
 
             return Ok(leaderboard);
         }
@@ -246,6 +263,55 @@ namespace OnlineQuizMVC.Controllers
                 return NotFound(new { error = "Soru bulunamadı." });
 
             return Ok(randomQuestion);
+        }
+
+
+        [HttpGet("questions/all-admin")]
+        public async Task<IActionResult> GetAllQuestionsAdmin()
+        {
+            var questions = await _context.Questions
+                .Select(q => new
+                {
+                    id = q.Id,
+                    topic = q.Topic,
+                    soru = q.QuestionText,
+                    secenekler = JsonSerializer.Deserialize<List<string>>(q.OptionsJson, (JsonSerializerOptions)null),
+                    dogruCevap = q.CorrectAnswer
+                })
+                .ToListAsync();
+
+            return Ok(questions);
+        }
+
+        [HttpDelete("questions/{id}")]
+        public async Task<IActionResult> DeleteQuestion(int id)
+        {
+            var question = await _context.Questions.FindAsync(id);
+            if (question == null) return NotFound(new { error = "Soru bulunamadı." });
+
+            _context.Questions.Remove(question);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Soru silindi." });
+        }
+
+        [HttpPut("questions/{id}")]
+        public async Task<IActionResult> UpdateQuestion(int id, [FromBody] QuestionDto model)
+        {
+            if (string.IsNullOrEmpty(model.Topic) || string.IsNullOrEmpty(model.QuestionText) || model.Options == null || model.Options.Count < 2 || string.IsNullOrEmpty(model.CorrectAnswer))
+                return BadRequest(new { error = "Eksik bilgi gönderildi." });
+
+            var question = await _context.Questions.FindAsync(id);
+            if (question == null) return NotFound(new { error = "Soru bulunamadı." });
+
+            question.Topic = model.Topic;
+            question.QuestionText = model.QuestionText;
+            question.OptionsJson = JsonSerializer.Serialize(model.Options);
+            question.CorrectAnswer = model.CorrectAnswer;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Soru güncellendi." });
         }
 
         public class QuestionDto
