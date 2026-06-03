@@ -2,6 +2,24 @@
     ViewData["Title"] = "Giriş Yap";
 }
 
+@section Styles {
+    <style>
+        body {
+            background-image: url('/images/auth-bg.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+        .auth-box {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1) !important;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+    </style>
+}
+
 <div class="main-content">
     <div class="box auth-box">
         <h3><span>Hoş Geldiniz</span>Giriş Yapın</h3>

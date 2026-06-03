@@ -2,6 +2,25 @@
     ViewData["Title"] = "Online Quiz Platformu";
 }
 
+@section Styles {
+    <style>
+        body {
+            background-image: url('/images/main-bg.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+        
+        .main-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+    </style>
+}
+
 <div class="main-content">
     <div id="quiz-area" style="display: none;"></div>
     <div id="message-area"></div>

@@ -43,6 +43,90 @@ body {
     justify-content: space-between;
 }
 
+/* GAMIFIED PROFILE STYLES */
+.avatar-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    color: white;
+    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+    position: relative;
+    flex-shrink: 0;
+}
+
+.level-badge {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e293b;
+    color: #fbbf24;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 900;
+    font-size: 12px;
+    border: 2px solid white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    white-space: nowrap;
+}
+
+.level-badge-inline {
+    background: #1e293b;
+    color: #fbbf24;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 11px;
+    display: inline-block;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.xp-text-top {
+    color: #0f172a;
+    font-size: 13px;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.xp-container {
+    background: #f1f5f9;
+    border-radius: 12px;
+    height: 16px;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.xp-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #10b981, #34d399);
+    border-radius: 12px;
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+.xp-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0f172a;
+    font-size: 12px;
+    font-weight: 800;
+    text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+}
+
 .bento-qotd {
     grid-column: span 1;
     background: linear-gradient(135deg, var(--color-primary), #8b5cf6);
@@ -52,12 +136,161 @@ body {
     justify-content: center;
 }
 
+.bento-quests {
+    grid-column: span 1;
+    background: linear-gradient(135deg, #1e293b, #334155);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.quest-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.quest-card {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    border: 2px solid #e2e8f0;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.quest-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+}
+
+.quest-card.completed {
+    background: #ecfdf5;
+    border-color: #34d399;
+}
+
+.quest-card.completed .quest-card-icon {
+    filter: grayscale(1);
+    opacity: 0.5;
+}
+
+.quest-card-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    margin-bottom: 15px;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+}
+
+.bg-blue { background: linear-gradient(135deg, #3b82f6, #60a5fa); }
+.bg-orange { background: linear-gradient(135deg, #f97316, #fb923c); }
+.bg-green { background: linear-gradient(135deg, #10b981, #34d399); }
+
+.quest-card-content {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+    flex: 1;
+}
+
+.quest-card-content strong {
+    font-size: 16px;
+    color: #0f172a;
+    margin-bottom: 4px;
+}
+
+.quest-card-content span {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.quest-card-reward {
+    font-size: 13px;
+    font-weight: 800;
+    color: #fbbf24;
+    background: #fffbeb;
+    padding: 6px 15px;
+    border-radius: 20px;
+    border: 1px solid #fde68a;
+}
+
+.quest-card.completed .quest-card-reward {
+    color: #059669;
+    background: #d1fae5;
+    border-color: #6ee7b7;
+}
+
 .bento-categories {
     grid-column: span 2;
 }
 
 .bento-leaderboard {
     grid-column: span 1;
+}
+
+.bento-badges {
+    background: linear-gradient(135deg, #fffbeb, #fef3c7);
+    border-color: #fde68a;
+}
+
+.mini-badges-container {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+}
+
+.badge-item {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 8px 12px;
+    min-width: 90px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    border: 2px solid #fbbf24;
+    transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.badge-item:hover {
+    transform: translateY(-3px);
+}
+
+.badge-item.locked {
+    filter: grayscale(1);
+    opacity: 0.5;
+    border-color: #cbd5e1;
+    background: #f1f5f9;
+}
+
+.badge-icon {
+    font-size: 24px;
+    margin-bottom: 4px;
+}
+
+.badge-name {
+    font-weight: 800;
+    font-size: 11px;
+    color: #0f172a;
+    line-height: 1.1;
+}
+
+.badge-desc {
+    display: none;
 }
 
 .stats-row {
@@ -76,9 +309,24 @@ body {
     flex-direction: column;
 }
 
-.stat-box.blue { border-left: 4px solid var(--color-primary); }
-.stat-box.green { border-left: 4px solid #10b981; }
-.stat-box.purple { border-left: 4px solid #8b5cf6; }
+.game-stat {
+    border-bottom: 4px solid #cbd5e1;
+    transition: transform 0.2s, border-width 0.2s;
+}
+
+.game-stat:hover {
+    transform: translateY(-2px);
+    border-bottom-width: 6px;
+}
+
+.game-stat:active {
+    transform: translateY(2px);
+    border-bottom-width: 2px;
+}
+
+.stat-box.blue { border-color: #bfdbfe; border-bottom-color: #3b82f6; }
+.stat-box.green { border-color: #bbf7d0; border-bottom-color: #10b981; }
+.stat-box.purple { border-color: #ddd6fe; border-bottom-color: #8b5cf6; }
 
 .stat-value { font-size: 32px; font-weight: 800; color: #0f172a; margin-bottom: 5px; }
 .stat-label { font-size: 14px; color: #64748b; font-weight: 600; }
@@ -91,15 +339,24 @@ body {
 .lb-list { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
 .lb-item { display: flex; align-items: center; padding: 12px; background: #f8fafc; border-radius: 12px; transition: 0.2s; }
 .lb-item:hover { background: #f1f5f9; transform: translateX(5px); }
-.lb-rank { width: 30px; font-weight: 800; font-size: 18px; color: #94a3b8; }
-.lb-rank.gold { color: #fbbf24; }
-.lb-rank.silver { color: #94a3b8; }
-.lb-rank.bronze { color: #d97706; }
-.lb-name { flex: 1; font-weight: 600; color: #334155; }
-.lb-score { font-weight: 800; color: var(--color-primary); }
 
-.progress-bg { background: #e2e8f0; height: 6px; border-radius: 3px; margin-top: 15px; width: 100%; overflow: hidden; }
-.progress-fill { height: 100%; background: linear-gradient(90deg, var(--color-primary), #8b5cf6); border-radius: 3px; transition: width 1s ease; }
+/* Arcade Leaderboard Specifics */
+.arcade-lb .lb-item {
+    border: 2px solid transparent;
+}
+.arcade-lb .lb-item:nth-child(1) { border-color: #fbbf24; background: #fffbeb; }
+.arcade-lb .lb-item:nth-child(2) { border-color: #94a3b8; background: #f8fafc; }
+.arcade-lb .lb-item:nth-child(3) { border-color: #d97706; background: #fff7ed; }
+
+.lb-rank { width: 35px; font-weight: 800; font-size: 18px; color: #94a3b8; text-align: center; }
+.lb-rank.gold { color: #fbbf24; font-size: 24px; text-shadow: 0 2px 4px rgba(251,191,36,0.3); }
+.lb-rank.silver { color: #94a3b8; font-size: 20px; }
+.lb-rank.bronze { color: #d97706; font-size: 18px; }
+.lb-name { flex: 1; font-weight: 600; color: #334155; margin-left: 10px; }
+.lb-score { font-weight: 900; color: var(--color-primary); background: #eff6ff; padding: 4px 10px; border-radius: 8px; }
+
+.progress-bg { background: #e2e8f0; height: 8px; border-radius: 4px; margin-top: 15px; width: 100%; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1); }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--color-primary), #8b5cf6); border-radius: 4px; transition: width 1s ease; }
 
 /* Minimalist Navbar */
 .navbar {

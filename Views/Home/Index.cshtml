@@ -4,12 +4,20 @@
 
 @section Styles {
     <style>
+        body {
+            background-image: url('/images/main-bg.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+        
         /* Kaydırma çubuğu tasarımı */
         .topic-grid-scroll::-webkit-scrollbar {
             width: 8px;
         }
         .topic-grid-scroll::-webkit-scrollbar-track {
-            background: #f1f5f9; 
+            background: rgba(241, 245, 249, 0.8); 
             border-radius: 10px;
         }
         .topic-grid-scroll::-webkit-scrollbar-thumb {
@@ -24,34 +32,58 @@
 
 <div class="bento-container">
     
-    <!-- Welcome & Stats -->
+    <!-- Profile & Stats -->
     <div class="bento-item bento-stats">
-        <div>
-            <h2 id="welcomeText" style="margin: 0; font-size: 28px; font-weight: 800; color: #0f172a;">Hoş Geldiniz 👋</h2>
-            <p style="margin: 8px 0 0 0; color: #64748b; font-size: 15px;">Eğitim istatistikleriniz ve güncel durumunuz.</p>
+        <!-- Top row: Avatar and Info -->
+        <div style="display: flex; gap: 24px; align-items: center; margin-bottom: 25px;">
+            <div class="avatar-circle">
+                🧑‍🚀
+            </div>
+            <div style="flex: 1;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px;">
+                    <div>
+                        <h2 id="welcomeText" style="margin: 0 0 4px 0; font-size: 24px; font-weight: 800; color: #0f172a;">Hoş Geldiniz 👋</h2>
+                        <div class="level-badge-inline" id="profileLevelBadge">Lvl 1 • Başlangıç</div>
+                    </div>
+                    <div id="profileXpText" class="xp-text-top">0 / 50 XP</div>
+                </div>
+                
+                <div class="xp-container">
+                    <div id="profileXpFill" class="xp-fill"></div>
+                </div>
+            </div>
         </div>
-        <div class="stats-row">
-            <div class="stat-box blue">
+
+        <!-- Middle row: Stats -->
+        <div class="stats-row" style="margin-top: 0; margin-bottom: 25px;">
+            <div class="stat-box game-stat blue">
                 <div class="stat-value" id="dashTotalExams">0</div>
-                <div class="stat-label">Çözülen Sınav</div>
+                <div class="stat-label">Sınav</div>
             </div>
-            <div class="stat-box green">
+            <div class="stat-box game-stat green">
                 <div class="stat-value" id="dashSuccessRate">%0</div>
-                <div class="stat-label">Başarı Oranı</div>
+                <div class="stat-label">Başarı</div>
             </div>
-            <div class="stat-box purple">
+            <div class="stat-box game-stat purple">
                 <div class="stat-value" id="dashLastScore">-</div>
                 <div class="stat-label">Son Skor</div>
             </div>
         </div>
+
     </div>
 
-    <!-- Question of the Day -->
-    <div class="bento-item bento-qotd">
-        <h3 class="qotd-title">💡 Günün Sorusu</h3>
-        <p id="qotd-preview-text" class="qotd-desc">Modern ECMAScript standartlarında 'sabit' bir değişken tanımlamak için hangisi kullanılır?</p>
-        <button class="qotd-btn" onclick="window.location.href='/Home/DailyQuestion'">Hemen Çöz</button>
+    <!-- Daily Question (Restored) -->
+    <div class="bento-item bento-qotd" onclick="window.location.href='/Home/DailyQuestion'" style="cursor: pointer;">
+        <h3 class="qotd-title">🌟 Günün Sorusu</h3>
+        <p class="qotd-text" id="qotd-preview-text">Soru yükleniyor...</p>
+        <button class="action-btn qotd-btn" style="background: white; color: var(--color-primary); margin-top: 15px;">Hemen Çöz</button>
     </div>
+
+
+
+
+
+
 
     <!-- Categories -->
     <div class="bento-item bento-categories" style="grid-column: span 2;">
@@ -108,11 +140,44 @@
     </div>
 
     <!-- Leaderboard -->
-    <div class="bento-item bento-leaderboard">
+    <div class="bento-item bento-leaderboard arcade-lb">
         <h3 style="margin: 0 0 5px 0; font-size: 20px; color: #0f172a;">🏆 Haftalık Liderlik Tablosu</h3>
-        <p style="color: #64748b; font-size: 13px; margin: 0 0 15px 0;">Son 7 günün en başarılı üyeleri</p>
-        <div class="lb-list" id="realLeaderboardList">
-            <div style="text-align: center; color: #94a3b8; font-size: 14px; margin-top: 20px;">Kullanıcılar yükleniyor...</div>
+        <p style="margin: 0 0 15px 0; font-size: 13px; color: #64748b;">Son 7 günün en başarılı üyeleri</p>
+        
+        <div class="lb-list" id="lbList">
+            <!-- JS Dolduracak -->
+            <div style="font-size: 13px; color: #64748b;">Yükleniyor...</div>
+        </div>
+    </div>
+
+    <!-- Daily Quests (New Sleek Design) -->
+    <div class="bento-item bento-quests" style="grid-column: span 3; background: #ffffff; border: 1px solid #e2e8f0; color: #0f172a;">
+        <h3 style="margin: 0 0 15px 0; font-size: 20px; color: #0f172a;">🎯 Günlük Görevler</h3>
+        <div class="quest-cards-container" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+            <div class="quest-card" id="questCard1">
+                <div class="quest-card-icon bg-blue">👋</div>
+                <div class="quest-card-content">
+                    <strong>Sisteme Giriş</strong>
+                    <span>Platforma günlük ziyaret</span>
+                </div>
+                <div class="quest-card-reward" id="quest1-reward">🎁 10 XP</div>
+            </div>
+            <div class="quest-card" id="questCard2">
+                <div class="quest-card-icon bg-orange">📝</div>
+                <div class="quest-card-content">
+                    <strong>İlk Sınav</strong>
+                    <span>Bugün 1 sınav çöz</span>
+                </div>
+                <div class="quest-card-reward" id="quest2-reward">🎁 50 XP</div>
+            </div>
+            <div class="quest-card" id="questCard3">
+                <div class="quest-card-icon bg-green">🔥</div>
+                <div class="quest-card-content">
+                    <strong>%50 Başarı</strong>
+                    <span>Genel başarıyı yükselt</span>
+                </div>
+                <div class="quest-card-reward" id="quest3-reward">🎁 100 XP</div>
+            </div>
         </div>
     </div>
 
@@ -172,13 +237,34 @@
             }
             document.getElementById("welcomeText").innerText = "Merhaba, " + userName + " 👋";
             
-            // Veritabanından gerçek ad/soyadı çek
+            // Veritabanından gerçek ad/soyadı ve TotalScore çek
             fetch(`/api/user?name=${userName}`)
             .then(res => res.json())
             .then(data => {
-                if(!data.error && (data.firstname || data.surname)) {
-                    const fullName = `${data.firstname} ${data.surname}`.trim();
-                    document.getElementById("welcomeText").innerText = "Merhaba, " + fullName + " 👋";
+                if(!data.error) {
+                    if (data.firstname || data.surname) {
+                        const fullName = `${data.firstname} ${data.surname}`.trim();
+                        document.getElementById("welcomeText").innerText = "Merhaba, " + fullName + " 👋";
+                    }
+                    if (window.LevelSystem) {
+                        const progressData = window.LevelSystem.getLevelProgress(data.totalScore);
+                        
+                        let league = "Başlangıç";
+                        if(progressData.level >= 3 && progressData.level < 6) league = "Usta";
+                        if(progressData.level >= 6) league = "Efsane";
+                        
+                        document.getElementById("profileLevelBadge").innerText = `Lvl ${progressData.level} • ${league}`;
+                        
+                        setTimeout(() => {
+                            document.getElementById("profileXpFill").style.width = progressData.progressPercent + "%";
+                        }, 300);
+                        
+                        const currentXPInLevel = data.totalScore - progressData.xpCurrentBase;
+                        const requiredXPForNext = progressData.xpNext - progressData.xpCurrentBase;
+                        document.getElementById("profileXpText").innerText = `${currentXPInLevel} / ${requiredXPForNext} XP`;
+                        
+                        loadQuests(data.totalScore);
+                    }
                 }
             })
             .catch(err => console.log(err));
@@ -205,12 +291,36 @@
             }
         }
 
+        function loadQuests(totalScore) {
+            const today = new Date().toLocaleDateString();
+            let quests = JSON.parse(localStorage.getItem("daily_quests")) || { date: "", q1: false, q2: false, q3: false };
+            
+            if (quests.date !== today) {
+                quests = { date: today, q1: true, q2: false, q3: false }; // Login quest always true on load
+                localStorage.setItem("daily_quests", JSON.stringify(quests));
+            }
+            
+            // Simüle edilmiş mantık (Sınav çözenler vs.)
+            if (quests.q1) {
+                document.getElementById("questCard1").classList.add("completed");
+                document.getElementById("quest1-reward").innerText = "✅ Alındı";
+            }
+            if (quests.q2) {
+                document.getElementById("questCard2").classList.add("completed");
+                document.getElementById("quest2-reward").innerText = "✅ Alındı";
+            }
+            if (quests.q3) {
+                document.getElementById("questCard3").classList.add("completed");
+                document.getElementById("quest3-reward").innerText = "✅ Alındı";
+            }
+        }
+
         function loadRealLeaderboard() {
             fetch('/api/leaderboard')
             .then(res => res.json())
             .then(data => {
-                const lbList = document.getElementById("realLeaderboardList");
-                if(data.error || data.length === 0) {
+                const lbList = document.getElementById("lbList");
+                if(!data || data.error || data.length === 0) {
                     lbList.innerHTML = '<div style="text-align: center; color: #94a3b8; font-size: 14px; margin-top: 20px;">Henüz kimse skor üretmemiş.</div>';
                     return;
                 }
@@ -218,18 +328,23 @@
                 lbList.innerHTML = '';
                 data.forEach((user, index) => {
                     let rankClass = "";
-                    if(index === 0) rankClass = "gold";
-                    else if(index === 1) rankClass = "silver";
-                    else if(index === 2) rankClass = "bronze";
+                    let medalIcon = "";
+                    if(index === 0) { rankClass = "gold"; medalIcon = "🥇"; }
+                    else if(index === 1) { rankClass = "silver"; medalIcon = "🥈"; }
+                    else if(index === 2) { rankClass = "bronze"; medalIcon = "🥉"; }
+                    else { medalIcon = (index + 1).toString(); }
                     
                     let userLevel = window.LevelSystem ? window.LevelSystem.getLevelFromXP(user.score) : 1;
+                    let league = "Bronz Lig";
+                    if(userLevel >= 3 && userLevel < 6) league = "Gümüş Lig";
+                    if(userLevel >= 6) league = "Altın Lig";
                     
                     lbList.innerHTML += `
                         <div class="lb-item">
-                            <div class="lb-rank ${rankClass}">${index + 1}</div>
-                            <div class="lb-name" style="display:flex; align-items:center; gap:6px;">
-                                ${user.name}
-                                <span style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: bold;">Lvl ${userLevel}</span>
+                            <div class="lb-rank ${rankClass}">${medalIcon}</div>
+                            <div class="lb-name" style="display:flex; flex-direction:column;">
+                                <span>${user.name}</span>
+                                <span style="font-size: 11px; color: #94a3b8; font-weight: normal;">Lvl ${userLevel} • ${league}</span>
                             </div>
                             <div class="lb-score">${user.score} XP</div>
                         </div>
@@ -288,6 +403,25 @@
                 if (totalQuestions > 0) {
                     let rate = Math.round((totalCorrect / totalQuestions) * 100);
                     document.getElementById("dashSuccessRate").innerText = "%" + rate;
+                    
+                    // Görev 3 Kontrolü: %50 Başarı
+                    if (rate >= 50) {
+                        let quests = JSON.parse(localStorage.getItem("daily_quests"));
+                        if (quests && !quests.q3) {
+                            quests.q3 = true;
+                            localStorage.setItem("daily_quests", JSON.stringify(quests));
+                            // Basit bir XP ödülü simülasyonu
+                        }
+                    }
+                }
+                
+                // Görev 2 Kontrolü: En az 1 sınav
+                if (uniqueTopics.size > 0) {
+                    let quests = JSON.parse(localStorage.getItem("daily_quests"));
+                    if (quests && !quests.q2) {
+                        quests.q2 = true;
+                        localStorage.setItem("daily_quests", JSON.stringify(quests));
+                    }
                 }
                 
                 document.getElementById("dashLastScore").innerText = lastScoreValue;
