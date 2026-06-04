@@ -237,6 +237,17 @@
             }
             document.getElementById("welcomeText").innerText = "Merhaba, " + userName + " 👋";
             
+            // Profil resmini localStorage'dan al ve göster
+            const savedImage = localStorage.getItem(`pfp_${userName}`);
+            if (savedImage) {
+                const avatarCircle = document.querySelector(".avatar-circle");
+                if (avatarCircle) {
+                    avatarCircle.innerHTML = `<img src="${savedImage}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #3b82f6;">`;
+                    avatarCircle.style.background = "none";
+                    avatarCircle.style.boxShadow = "0 4px 10px rgba(59, 130, 246, 0.2)";
+                }
+            }
+
             // Veritabanından gerçek ad/soyadı ve TotalScore çek
             fetch(`/api/user?name=${userName}`)
             .then(res => res.json())

@@ -200,7 +200,7 @@
         <button class="modal-close" onclick="closeModal(null, true)">X</button>
         
         <div style="text-align: center; margin-bottom: 20px;">
-            <div style="font-size: 50px; margin-bottom: 10px;">👤</div>
+            <div id="modalAvatarDiv" style="font-size: 50px; margin-bottom: 10px; display: flex; justify-content: center; align-items: center; height: 80px;">👤</div>
             <h2 id="modalUserName" style="margin: 0; color: #0f172a;">Kullanıcı Adı</h2>
             <p id="modalUserEmail" style="margin: 5px 0 0 0; color: #64748b;">email@domain.com</p>
         </div>
@@ -375,6 +375,14 @@
             document.getElementById('modalTotalScore').innerText = "...";
             document.getElementById('modalAge').innerText = "...";
             document.getElementById('modalExamHistory').innerHTML = '<p style="text-align: center; color: #64748b;">Yükleniyor...</p>';
+
+            const modalAvatarDiv = document.getElementById('modalAvatarDiv');
+            const savedImage = localStorage.getItem(`pfp_${username}`);
+            if (savedImage) {
+                modalAvatarDiv.innerHTML = `<img src="${savedImage}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #3b82f6; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);">`;
+            } else {
+                modalAvatarDiv.innerHTML = `👤`;
+            }
 
             try {
                 // Temel bilgileri çek
